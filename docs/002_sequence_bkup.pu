@@ -1,0 +1,54 @@
+@startuml SequenceDiagram
+participant main as main
+participant bkup.BackupFacade as BF
+participant srcrepo.SourceRepository as SrcRepo
+participant dstrepo.DestinationRepository as DstRepo
+participant metarepo.MetadataRepository as MetaRepo
+participant scanner.AllFileScanner as Scnr
+database FileSystem as FS
+database SQLite3 as DB
+
+main -> BF: execute()
+group Get all files
+BF -> Scnr: get_all_files()
+Scnr -> FS:
+FS --> Scnr:
+Scnr --> BF: all_files
+end
+group Get source files
+BF -> SrcRepo: get_files_matching_criteria(all_files)
+SrcRepo --> BF: src_files
+end
+group Cleanup of metadata corresponding to already deleted files
+BF -> MetaRepo: get_uncontained_keys(src_files)
+MetaRepo -> DB: SELECT
+DB --> MetaRepo: result
+MetaRepo --> BF: uncontained_keys
+BF -> MetaRepo: remove_metadatas(uncontained_keys)
+    loop until the generator finishes
+    MetaRepo -> DB: DELETE
+    MetaRepo -> BF: **yield** removed_metadata <return value is discarded>
+    end
+end
+group Create backup and update metadata
+BF -> BF: _get_backup_list(src_files)
+BF --> BF: backup_list
+BF -> DstRepo: create_backups(backup_list)
+    loop until the generator finishes
+    DstRepo -> FS: shutil.copy2(src_file, dst_file)
+    DstRepo --> BF: **yield** backed_up_src_file
+    BF -> MetaRepo: update_metadata(backed_up_src_file)
+    MetaRepo -> DB: REPLACE INTO
+    end
+end
+group Discard old backups
+BF -> DstRepo: get_discard_list(today, all_files)
+DstRepo --> BF: discard_list
+BF --> DstRepo: remove_backups(discard_list)
+    loop until the generator finishes
+    DstRepo -> FS:os.remove(file_to_be_removed)
+    DstRepo --> BF: **yield** removed_file <return value is discarded>
+    end
+end
+BF --> main: return
+@enduml

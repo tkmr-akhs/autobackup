@@ -1,0 +1,45 @@
+@startuml SequenceDiagram
+title Sequence Diagram
+
+participant main as entry
+participant main.Main as main
+participant cnf as cnf
+participant cnf.ConfigurationLoader as CnfLoader
+participant appinit as appinit
+participant logging as log
+database CnfDir as CNF
+
+entry -> main: main(args)
+
+group Parsing command line arguments
+main -> cnf: get_cli_cnf(args)
+cnf --> main: {cnf_dir, cli_cnf}
+end
+
+group Preparation of configuration data
+main -> CnfLoader: init(cnf_dir)
+CnfLoader --> main: ConfigurationLoader
+main -> CnfLoader: get_app_cnf(cli_cnf)
+CnfLoader -> CNF: tomllib.load(defaults.toml)
+CNF --> CnfLoader: defaults
+CnfLoader -> CNF: tomllib.load(my_settings.toml)
+CNF --> CnfLoader: usr_cnf
+CnfLoader -> cnf: merge_app_cnf(defaults, usr_cnf, cli_cnf)
+cnf --> CnfLoader: app_cnf
+CnfLoader -> cnf: validate_app_cnf(app_cnf)
+cnf --> CnfLoader: <If not valid then raise Error>
+CnfLoader --> main: app_cnf
+main -> CnfLoader: get_log_cnf()
+CnfLoader -> CNF: tomllib.load(logging.toml)
+CNF --> CnfLoader: log_cnf
+CnfLoader --> main: log_cnf
+end
+
+group Initialize App
+main -> appinit: init_app(app_cnf)
+main -> log: logging.config.dictConfig(log_cnf)
+end
+
+main --> entry: Main
+entry -> main: execute()
+@enduml

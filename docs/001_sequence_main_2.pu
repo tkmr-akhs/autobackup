@@ -1,0 +1,35 @@
+@startuml SequenceDiagram
+title Sequence Diagram
+
+participant main.Main as main
+participant repoinit.BackupRepositoryFactory as BFactory
+participant repoinit.MetadataRepositoryFactory as MFactory
+participant bkup.BackupFacade as BFacade
+database SQLite as DB
+
+group Preparation for SourceRepository and DestinationRepository
+main -> BFactory: init(app_cnf)
+BFactory --> main: BackupRepositoryFactory
+main -> BFactory: get_source_repository()
+BFactory --> main: SourceRepository
+main -> BFactory: get_destination_repository()
+BFactory --> main: DestinationRepository
+main -> BFactory: get_all_file_scanner()
+BFactory --> main: AllFileScanner
+end
+group Preparation for MetadataRepository
+main -> DB: connect()
+DB --> main: Connection
+main -> MFactory: init(Connection)
+MFactory --> main: MetadataRepositoryFactory
+main -> MFactory: get_metadata_repository()
+MFactory --> main: MetadataRepository
+end
+group Preparation for BackupFacade
+main -> BFacade: init(SourceRepository, DestinationRepository, MetadataRepository, AllFileScanner)
+BFacade --> main: BackupFacade
+end
+group Execute backup
+main -> BFacade: execute()
+end
+@enduml

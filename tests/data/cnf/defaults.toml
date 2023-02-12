@@ -1,0 +1,9 @@
+[common]
+tmp_dirpath = 'tests/tmp/tests.integ.test_main/tmp'
+var_dirpath = 'tests/tmp/tests.integ.test_main/var'
+log_dirpath = 'tests/tmp/tests.integ.test_main/var/log'
+db_filename = 'fileinfo.sqlite3'
+destination_dir = '.old'
+datetime_format = '_%Y-%m-%d'
+use_seq_num = true
+seq_num_sep = '_'

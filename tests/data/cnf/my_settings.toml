@@ -1,0 +1,6 @@
+[[targets]]
+path = 'tests/tmp/tests.integ.test_main/TestDir'
+catch_regex = '.*'
+ignore_regex = ''
+catch_hidden = true
+catch_link = false
