@@ -1,5 +1,6 @@
 """Module for backup destination repository"""
 import datetime
+import math
 import os
 import pathlib
 import re
@@ -108,6 +109,38 @@ def _escape_re_sp(text: str) -> str:
         else:
             result = result + char
     return result
+
+
+def _get_phase1_date(today: datetime.date, phase1_weeks: int) -> datetime.date:
+    if not phase1_weeks is None:
+        return today - datetime.timedelta(
+            days=today.weekday() + 7 * math.floor(phase1_weeks)
+        )
+
+
+def _get_phase2_date(today: datetime.date, phase2_months: int) -> datetime.date:
+    if not phase2_months is None:
+        p2_years = math.floor(phase2_months / 12)
+        p2_months = math.floor(phase2_months - p2_years * 12)
+        if today.month <= p2_months:
+            # subtraction carry forward
+            return datetime.date(
+                today.year - p2_years - 1, today.month + 12 - p2_months, 1
+            )
+        else:
+            return datetime.date(today.year - p2_years, today.month - p2_months, 1)
+
+
+def _is_in_phase1(
+    mtime: datetime.datetime, phase1: datetime.date, phase2: datetime.date
+) -> bool:
+    return not phase1 is None and mtime.date() < phase1
+
+
+def _is_in_phase2(
+    mtime: datetime.datetime, phase1: datetime.date, phase2: datetime.date
+) -> bool:
+    return not phase2 is None and mtime.date() < phase2 and mtime.date() < phase1
 
 
 #### Classes ####
@@ -313,27 +346,37 @@ class DestinationRepository:
 
     def get_discard_list(
         self,
-        today: datetime.date,
         all_files: dict[str, FoundFile] = None,
+        today: datetime.date = datetime.date.today(),
+        phase1_weeks: int = None,
+        phase2_months: int = None,
     ) -> Generator[FoundFile]:
-        """Obtains a list of files to be discarded.
+        """Get a list of files to be discarded.
 
-        Files up to 2 weeks old are all retained and not listed as files to be discarded.\
+        By default, files that are up to 2 weeks old are all kept and not listed as\
+        files to be discarded.
         Files from 2 weeks to 2 months old are in Phase 1, and files older than 2\
         months are in Phase 2.
 
-        In Phase 1, only the latest file per day shall be retained, the rest shall be\
-        discarded. In Phase 2, only the latest file per week shall be retained and the rest\
-        shall be discarded.
+        In Phase 1, only the latest file per day is kept, the rest are discarded. In\
+        Phase 2, only the latest file per week is kept, and the rest are discarded.
 
         Args:
-            today (datetime.date): Today
             all_files (dict[str, FoundFile], optional):\
                 dict of information for all files already retrieved externally with AllFileScanner.\
                 If omitted or None is passed, AllFileScanner is used internally.
+            today (datetime.date, optional):\
+                The date that serves as the starting point for determining the actual\
+                duration of Phase 1 or Phase 2. Defaults to datetime.date.today().
+            phase1_weeks (int, optional):
+                The number of weeks that make up Phase 1, counting backwards from\
+                today. Defaults to None.
+            phase2_months (int, optional):
+                The number of months that make up Phase 2, counting backwards from\
+                today. Defaults to None.
 
         Yields:
-            FoundFile: File to be discarded
+            FoundFile: A file to be discarded
         """
         dst_files = self.get_all_backups(all_files)
 
@@ -341,48 +384,42 @@ class DestinationRepository:
 
         result = []
         if len(dst_files_dict) < 1:
-            return result
+            yield from result
 
         # Date of Phase Switchover
-        # phase1: 2 weeks to 2 months past
-        phase1 = today - datetime.timedelta(days=today.weekday() + 14)
-        # phase2: more than 2 months past
-        if today.month < 3:
-            phase2 = datetime.date(today.year - 1, today.month + 10, 1)
-        else:
-            phase2 = datetime.date(today.year, today.month - 2, 1)
+        phase1 = _get_phase1_date(today, phase1_weeks)
+        phase2 = _get_phase2_date(today, phase2_months)
 
         # Temporary dict
         phase1_keep = {}
         phase2_keep = {}
         for key, (file, base_path) in dst_files_dict.items():
             mtime = datetime.datetime.fromtimestamp(file.mtime)
-            if mtime.date() < phase1:
-                # discard canditates
-                if mtime.date() < phase2:
-                    # phase2: keep newest file per week
-                    aggregation_date = mtime.date() - datetime.timedelta(
-                        days=mtime.date().weekday()
-                    )
-                    _separate_keep_and_discard_backup_files(
-                        result,
-                        phase2_keep,
-                        mtime,
-                        aggregation_date,
-                        base_path,
-                        file,
-                    )
-                else:
-                    # phase1: keep newest file per day
-                    aggregation_date = mtime.date()
-                    _separate_keep_and_discard_backup_files(
-                        result,
-                        phase1_keep,
-                        mtime,
-                        aggregation_date,
-                        base_path,
-                        file,
-                    )
+
+            if _is_in_phase2(mtime, phase1, phase2):
+                # phase2: keep newest file per week
+                aggregation_date = mtime.date() - datetime.timedelta(
+                    days=mtime.date().weekday()
+                )
+                _separate_keep_and_discard_backup_files(
+                    result,
+                    phase2_keep,
+                    mtime,
+                    aggregation_date,
+                    base_path,
+                    file,
+                )
+            elif _is_in_phase1(mtime, phase1, phase2):
+                # phase1: keep newest file per day
+                aggregation_date = mtime.date()
+                _separate_keep_and_discard_backup_files(
+                    result,
+                    phase1_keep,
+                    mtime,
+                    aggregation_date,
+                    base_path,
+                    file,
+                )
 
         # It is not worth being yield at this time.
         # This is in case we come up with a way to make it more efficient in the future.

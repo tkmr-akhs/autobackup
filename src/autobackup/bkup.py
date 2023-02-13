@@ -33,7 +33,12 @@ class BackupFacade:
         self._scnr = scnr
         self._logger = getLogger(__name__)
 
-    def execute(self) -> None:
+    def execute(
+        self,
+        discard_old_backups: bool = True,
+        phase1_weeks: int = 2,
+        phase2_months: int = 2,
+    ) -> None:
         """Execute backup."""
         # Get All Files
         all_files = self._scnr.get_all_files()
@@ -55,9 +60,12 @@ class BackupFacade:
             )
 
         # Discard old backups
-        discard_list = self._d_repo.get_discard_list(datetime.date.today(), all_files)
-        for _ in self._d_repo.remove_backups(discard_list):
-            pass
+        if discard_old_backups:
+            discard_list = self._d_repo.get_discard_list(
+                all_files, phase1_weeks=phase1_weeks, phase2_months=phase2_months
+            )
+            for _ in self._d_repo.remove_backups(discard_list):
+                pass
 
     def _get_backup_list(self, file_dict: dict[str, FoundFile]) -> Generator[FoundFile]:
         """Get a list of files that need to be backed up.

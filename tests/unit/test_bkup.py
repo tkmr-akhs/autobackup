@@ -165,13 +165,17 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     )
 
     # STEP 7
-    def _get_discard_list(x, y):
+    def _get_discard_list(*args, **kwargs):
         nonlocal actual_called
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
-        actual_args[co_name] = (str(type(x).__name__), str(type(y).__name__))
+        actual_args[co_name] = (
+            str(type(args[0]).__name__),
+            str(type(kwargs["phase1_weeks"]).__name__),
+            str(type(kwargs["phase2_months"]).__name__),
+        )
         actual_called.append(co_name + "[yield start]")
-        for i, _ in enumerate(y):
+        for i, _ in enumerate(args[0]):
             if i == 0:
                 actual_called.append(f"{co_name}[{i}]")
                 yield fsutil.FoundFile("7-0")
@@ -307,5 +311,5 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
         "__get_backup_list": ("dict",),
         "_update_metadata": ("Metadata",),
         "_remove_backups": ("generator",),
-        "_get_discard_list": ("date", "dict"),
+        "_get_discard_list": ("dict", "int", "int"),
     }

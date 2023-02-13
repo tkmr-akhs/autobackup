@@ -462,7 +462,7 @@ def test_DestinationRepository_get_discard_list_IfFileInfoIsEmptyThenReturnEmpty
     all_files = {}
 
     # Act
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     # Assert
     assert actual == []
@@ -482,7 +482,7 @@ def test_DestinationRepository_get_discard_list_IfNotBackupedFileThenNotContainI
     all_files = {path0: fsutil.FoundFile(path0, None, path0_mtime)}
     # Act
 
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     # Assert
     assert actual == []
@@ -549,7 +549,7 @@ def test_DestinationRepository_get_discard_list_IfFileInfoIsPhase1ThenReturnDisc
     }
     expected = [path0_obj, path2_obj, path3_obj, path4_obj]
 
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     assert set(actual) == set(expected)
 
@@ -615,7 +615,7 @@ def test_DestinationRepository_get_discard_list_IfFileInfoIsPhase1ThenReturnDisc
     }
     expected = [path0_obj, path1_obj, path3_obj, path4_obj]
 
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     assert set(actual) == set(expected)
 
@@ -704,7 +704,7 @@ def test_DestinationRepository_get_discard_list_IfFileInfoIsPhase2ThenReturnDisc
         path13_obj,
     ]
 
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     assert set(actual) == set(expected)
 
@@ -793,7 +793,7 @@ def test_DestinationRepository_get_discard_list_IfFileInfoIsPhase2ThenReturnDisc
         path13_obj,
     ]
 
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     assert set(actual) == set(expected)
 
@@ -813,7 +813,7 @@ def test_DestinationRepository_get_discard_list_IfSeqNumFlagIsDisabledThenReturn
     all_files = {path0: path0_obj, path1: path1_obj}
     expected = [path0_obj]
 
-    actual = [item for item in d_repo.get_discard_list(today, all_files)]
+    actual = [item for item in d_repo.get_discard_list(all_files, today, 2, 2)]
 
     assert set(actual) == set(expected)
 
