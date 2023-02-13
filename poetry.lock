@@ -4,7 +4,7 @@
 name = "altgraph"
 version = "0.17.3"
 description = "Python graph (network) package"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -141,7 +141,7 @@ files = [
 name = "macholib"
 version = "1.16.2"
 description = "Mach-O header analysis and editing"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -168,7 +168,7 @@ files = [
 name = "pefile"
 version = "2023.2.7"
 description = "Python PE parsing module"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.0"
 files = [
@@ -196,7 +196,7 @@ testing = ["pytest", "pytest-benchmark"]
 name = "pyinstaller"
 version = "5.8.0"
 description = "PyInstaller bundles a Python application and all its dependencies into a single package."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "<3.12,>=3.7"
 files = [
@@ -230,7 +230,7 @@ hook-testing = ["execnet (>=1.5.0)", "psutil", "pytest (>=2.7.3)"]
 name = "pyinstaller-hooks-contrib"
 version = "2022.15"
 description = "Community maintained hooks for PyInstaller"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -321,7 +321,7 @@ develop = ["pylint", "pytest-cov"]
 name = "pywin32-ctypes"
 version = "0.2.0"
 description = ""
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -333,7 +333,7 @@ files = [
 name = "setuptools"
 version = "67.2.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -361,4 +361,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "455306f4b0fa6d96bfaaa7f695116379139035dc63ccf03d0114ed0a954bfabf"
+content-hash = "16a534698b7b44a614f7523f9cf0852e231f91d9e84b6fa962ffbcdbc10eea9f"

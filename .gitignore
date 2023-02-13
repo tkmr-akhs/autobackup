@@ -167,3 +167,7 @@ cython_debug/
 !/src/python-3.11-win/*
 /tests/tmp/*
 /.VSCodeCounter
+/build_env/.venv
+/build_env/poetry.lock
+/build_env/autobackup
+/build_env/pyproject.toml
