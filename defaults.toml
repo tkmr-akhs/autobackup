@@ -1,9 +1,0 @@
-[common]
-tmp_dirpath = 'tmp'
-var_dirpath = 'tmp'
-log_dirpath = 'tmp'
-db_filename = 'fileinfo.sqlite3'
-destination_dir = '.old'
-datetime_format = '_%Y-%m-%d'
-use_seq_num = true
-seq_num_sep = '_'
