@@ -112,23 +112,31 @@ def _escape_re_sp(text: str) -> str:
 
 
 def _get_phase1_date(today: datetime.date, phase1_weeks: int) -> datetime.date:
-    if not phase1_weeks is None:
-        return today - datetime.timedelta(
-            days=today.weekday() + 7 * math.floor(phase1_weeks)
-        )
+    if phase1_weeks is None:
+        return None
+
+    if phase1_weeks <= 0:
+        return None
+
+    return today - datetime.timedelta(
+        days=today.weekday() + 7 * math.floor(phase1_weeks)
+    )
 
 
 def _get_phase2_date(today: datetime.date, phase2_months: int) -> datetime.date:
-    if not phase2_months is None:
-        p2_years = math.floor(phase2_months / 12)
-        p2_months = math.floor(phase2_months - p2_years * 12)
-        if today.month <= p2_months:
-            # subtraction carry forward
-            return datetime.date(
-                today.year - p2_years - 1, today.month + 12 - p2_months, 1
-            )
-        else:
-            return datetime.date(today.year - p2_years, today.month - p2_months, 1)
+    if phase2_months is None:
+        return None
+
+    if phase2_months <= 0:
+        return None
+
+    p2_years = math.floor(phase2_months / 12)
+    p2_months = math.floor(phase2_months - p2_years * 12)
+    if today.month <= p2_months:
+        # subtraction carry forward
+        return datetime.date(today.year - p2_years - 1, today.month + 12 - p2_months, 1)
+    else:
+        return datetime.date(today.year - p2_years, today.month - p2_months, 1)
 
 
 def _is_in_phase1(
