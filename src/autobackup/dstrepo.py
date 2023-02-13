@@ -378,10 +378,10 @@ class DestinationRepository:
                 duration of Phase 1 or Phase 2. Defaults to datetime.date.today().
             phase1_weeks (int, optional):
                 The number of weeks that make up Phase 1, counting backwards from\
-                today. Defaults to None.
+                this week. Defaults to None.
             phase2_months (int, optional):
                 The number of months that make up Phase 2, counting backwards from\
-                today. Defaults to None.
+                this month. Defaults to None.
 
         Yields:
             FoundFile: A file to be discarded

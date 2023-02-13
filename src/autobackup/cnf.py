@@ -178,6 +178,21 @@ def get_cli_cnf(args: list[str]) -> dict[str, Any]:
         help="Specify the target directory and matching criteria in JSON. <Example>: "
         '{"path": "path/to/dir", "catch_regex": ".*", "ignore_regex": "", "catch_hidden": true, "catch_link": false}',
     )
+    parser.add_argument(
+        "--discard_old_backup",
+        type=bool,
+        help="Whether discard old backup or not.",
+    )
+    parser.add_argument(
+        "--discard_phase1_weeks",
+        type=int,
+        help="The number of weeks that make up Phase 1, counting backwards from this week.",
+    )
+    parser.add_argument(
+        "--discard_phase2_months",
+        type=int,
+        help="The number of months that make up Phase 2, counting backwards from this month.",
+    )
 
     result_common = {}
     result_targets = []

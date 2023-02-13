@@ -7,3 +7,6 @@ destination_dir = '.old'
 datetime_format = '_%Y-%m-%d'
 use_seq_num = true
 seq_num_sep = '_'
+discard_old_backup = true
+discard_phase1_weeks = 2
+discard_phase2_months = 2

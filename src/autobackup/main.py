@@ -89,7 +89,11 @@ class Main:
             b_facade = BackupFacade(s_repo, d_repo, m_repo, scnr)
 
             # Execute
-            b_facade.execute()
+            b_facade.execute(
+                self._app_cnf["common"]["discard_old_backup"],
+                self._app_cnf["common"]["discard_phase1_weeks"],
+                self._app_cnf["common"]["discard_phase2_months"],
+            )
 
         self._logger.info("FINISH: autobackup")
 

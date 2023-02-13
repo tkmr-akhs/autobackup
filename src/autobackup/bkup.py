@@ -45,10 +45,10 @@ class BackupFacade:
                 Whether to discard old backups. Defaults to True.
             phase1_weeks (int, optional):
                 The number of weeks that make up Phase 1, counting backwards from\
-                today. Defaults to 2.
+                this week. Defaults to 2.
             phase2_months (int, optional):
                 The number of months that make up Phase 2, counting backwards from\
-                today. Defaults to 2.
+                this month. Defaults to 2.
         """
         # Get All Files
         all_files = self._scnr.get_all_files()

@@ -144,6 +144,12 @@ def test_get_cli_cnf_IfCliArgsSetCnfThenReturnCnf():
         "true",
         "--seq_num_sep",
         "_",
+        "--discard_old_backup",
+        "true",
+        "--discard_phase1_weeks",
+        "2",
+        "--discard_phase2_months",
+        "2",
         "--target",
         '{"path": "path/to/dir5", "catch_regex": ".*", "ignore_regex": "", "catch_hidden": true, "catch_link": false}',
         "--target",
@@ -160,6 +166,9 @@ def test_get_cli_cnf_IfCliArgsSetCnfThenReturnCnf():
             "datetime_format": "_%Y-%m-%d",
             "use_seq_num": True,
             "seq_num_sep": "_",
+            "discard_old_backup": True,
+            "discard_phase1_weeks": 2,
+            "discard_phase2_months": 2,
         },
         "targets": [
             {
@@ -200,6 +209,9 @@ def test_get_cli_cnf_IfCliArgsSetNoneThenReturnCnfDictThatValueIsNone():
             "datetime_format": None,
             "use_seq_num": None,
             "seq_num_sep": None,
+            "discard_old_backup": None,
+            "discard_phase1_weeks": None,
+            "discard_phase2_months": None,
         },
     }
     # Act
@@ -239,6 +251,9 @@ def test_Configuration_get_app_cnf_ReturnExpectedCnf():
             "use_seq_num",
             "seq_num_sep",
             "cli_cnf_test",
+            "discard_old_backup",
+            "discard_phase1_weeks",
+            "discard_phase2_months",
         ]
     )
     assert set(actual["targets"][0].keys()) == set(
@@ -263,6 +278,9 @@ def test_Configuration_get_app_cnf_IfInitWithNoneThenReturnExpectedCnf():
             "use_seq_num",
             "seq_num_sep",
             "cli_cnf_test",
+            "discard_old_backup",
+            "discard_phase1_weeks",
+            "discard_phase2_months",
         ]
     )
     assert set(actual["targets"][0].keys()) == set(
