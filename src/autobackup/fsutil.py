@@ -8,7 +8,11 @@ from logging import getLogger
 
 
 class ScanLoopError(Exception):
-    pass
+    """Loop detected during recursive scan
+
+    Exception raised when a loop is detected during a recursive scan that follows a\
+    symbolic link.
+    """
 
 
 class RecursiveScanDir:
@@ -46,6 +50,7 @@ class RecursiveScanDir:
             dirpath (str, optional): Directory to scan recursively. Defaults to ".".
             catch_link (bool, optional):\
                 Whether to scan the directory where the symbolic link leads. Defaults to True.
+
         Yields:
             FoundFile: FoundFile object pointing to the path of file.
         """
