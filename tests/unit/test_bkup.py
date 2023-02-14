@@ -76,6 +76,7 @@ def test_BackupFacade_get_discard_list_IfNotBackupedFileThenNotContainIt(
 def test_BackupFacade_get_discard_list_IfFileInfoIsPhase1ThenReturnDiscardList(
     mocker, FoundFileMock, build_path
 ):
+    # Arrange
     mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
     today = datetime.date(2023, 1, 22)
     d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
@@ -136,14 +137,17 @@ def test_BackupFacade_get_discard_list_IfFileInfoIsPhase1ThenReturnDiscardList(
 
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
+    # Act
     actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
 
+    # Assert
     assert set(actual) == set(expected)
 
 
 def test_BackupFacade_get_discard_list_IfFileInfoIsPhase1ThenReturnDiscardList_2(
     mocker, FoundFileMock, build_path
 ):
+    # Arrange
     mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
     today = datetime.date(2023, 1, 23)
     d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
@@ -204,14 +208,17 @@ def test_BackupFacade_get_discard_list_IfFileInfoIsPhase1ThenReturnDiscardList_2
 
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
+    # Act
     actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
 
+    # Assert
     assert set(actual) == set(expected)
 
 
 def test_BackupFacade_get_discard_list_IfFileInfoIsPhase2ThenReturnDiscardList(
     mocker, FoundFileMock, build_path
 ):
+    # Arrange
     mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
     today = datetime.date(2023, 1, 22)
     d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
@@ -295,14 +302,17 @@ def test_BackupFacade_get_discard_list_IfFileInfoIsPhase2ThenReturnDiscardList(
 
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
+    # Act
     actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
 
+    # Assert
     assert set(actual) == set(expected)
 
 
 def test_BackupFacade_get_discard_list_IfFileInfoIsPhase2ThenReturnDiscardList_2(
     mocker, FoundFileMock, build_path
 ):
+    # Arrange
     mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
     today = datetime.date(2023, 1, 23)
     d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
@@ -386,14 +396,17 @@ def test_BackupFacade_get_discard_list_IfFileInfoIsPhase2ThenReturnDiscardList_2
 
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
+    # Act
     actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
 
+    # Assert
     assert set(actual) == set(expected)
 
 
 def test_BackupFacade_get_discard_list_IfSeqNumFlagIsDisabledThenReturnDiscardList(
     mocker, FoundFileMock, build_path
 ):
+    # Arrange
     mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
     today = datetime.date(2023, 1, 22)
     d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
@@ -408,8 +421,10 @@ def test_BackupFacade_get_discard_list_IfSeqNumFlagIsDisabledThenReturnDiscardLi
 
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
+    # Act
     actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
 
+    # Assert
     assert set(actual) == set(expected)
 
 
@@ -455,23 +470,31 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # Arrange
     mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
     mocker.patch("autobackup.scanner.AllFileScanner", new=AllFileScannerMock)
-    actual_called = []
+    actual_called = {}
+    actual_called_skip = {}
     actual_args = {}
 
     # STEP 1
     def _get_files_matching_criteria(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + "[yield start]")
         for key, value in x.items():
             if key == "1":
-                actual_called.append(f"{co_name}[{key}]SKIP")
+                actual_called_skip[co_name] += 1
             else:
-                actual_called.append(f"{co_name}[{key}]")
+                actual_called[co_name] += 1
                 yield (key, value)
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.srcrepo.SourceRepository.get_files_matching_criteria",
@@ -481,17 +504,24 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 2
     def _get_uncontained_keys(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + "[yield start]")
         for key in x:
             if key == "2":
-                actual_called.append(f"{co_name}[{key}]SKIP")
+                actual_called_skip[co_name] += 1
             else:
-                actual_called.append(f"{co_name}[{key}]")
+                actual_called[co_name] += 1
                 yield key
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.bkup.BackupFacade._get_uncontained_keys",
@@ -501,14 +531,21 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 3
     def _remove_metadatas(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + "[yield start]")
         for key in x:
-            actual_called.append(f"{co_name}[{key}]")
+            actual_called[co_name] += 1
             yield metarepo.Metadata(key, 0.0)
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.metarepo.MetadataRepository.remove_metadatas",
@@ -518,18 +555,24 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 4
     def _get_backup_list(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + "[yield start]")
         for key, value in x.items():
             if key == "4":
-                actual_called.append(f"{co_name}[{key}]SKIP")
+                actual_called_skip[co_name] += 1
             else:
-                actual_called.append(f"{co_name}[{key}]")
+                actual_called[co_name] += 1
                 yield value
-
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.bkup.BackupFacade._get_backup_list",
@@ -539,18 +582,24 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 5
     def _create_backups(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + "[yield start]")
         for item in x:
             if item.name == "5":
-                actual_called.append(f"{co_name}[{item.name}]SKIP")
+                actual_called_skip[co_name] += 1
             else:
-                actual_called.append(f"{co_name}[{item.name}]")
+                actual_called[co_name] += 1
                 yield (item, item)
-
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.dstrepo.DestinationRepository.create_backups",
@@ -560,10 +609,19 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 6
     def _update_metadata(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + f"[{os.path.basename(x.key)}]")
+        actual_called[co_name] += 1
         return None
 
     mocker.patch(
@@ -574,25 +632,32 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 7
     def _get_discard_list(*args, **kwargs):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (
             str(type(args[0]).__name__),
             str(type(kwargs["phase1_weeks"]).__name__),
             str(type(kwargs["phase2_months"]).__name__),
         )
-        actual_called.append(co_name + "[yield start]")
         for i, _ in enumerate(args[0]):
             if i == 0:
-                actual_called.append(f"{co_name}[{i}]")
+                actual_called[co_name] += 1
                 yield fsutil.FoundFile("7-0")
             elif i == 1:
-                actual_called.append(f"{co_name}[{i}]")
+                actual_called[co_name] += 1
                 yield fsutil.FoundFile("7-1")
             elif i == 2:
-                actual_called.append(f"{co_name}[{i}]")
+                actual_called[co_name] += 1
                 yield fsutil.FoundFile("7-2")
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.bkup.BackupFacade._get_discard_list",
@@ -602,17 +667,24 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # STEP 8
     def _remove_backups(x):
         nonlocal actual_called
+        nonlocal actual_called_skip
         nonlocal actual_args
         co_name = sys._getframe().f_code.co_name
+        actual_called[co_name] = (
+            0 if not co_name in actual_called.keys() else actual_called[co_name]
+        )
+        actual_called_skip[co_name] = (
+            0
+            if not co_name in actual_called_skip.keys()
+            else actual_called_skip[co_name]
+        )
         actual_args[co_name] = (str(type(x).__name__),)
-        actual_called.append(co_name + "[yield start]")
         for item in x:
             if item.name == "7-1":
-                actual_called.append(f"{co_name}[{item.name}]SKIP")
+                actual_called_skip[co_name] += 1
             else:
-                actual_called.append(f"{co_name}[{item.name}]")
+                actual_called[co_name] += 1
                 yield item
-        actual_called.append(co_name + "[yield finish]")
 
     mocker.patch(
         "autobackup.dstrepo.DestinationRepository.remove_backups",
@@ -655,61 +727,26 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     fcd.execute()
 
     # Assert
-    assert actual_called == [
-        "_get_files_matching_criteria[yield start]",
-        "_get_files_matching_criteria[0]",
-        "_get_files_matching_criteria[1]SKIP",
-        "_get_files_matching_criteria[2]",
-        "_get_files_matching_criteria[3]",
-        "_get_files_matching_criteria[4]",
-        "_get_files_matching_criteria[5]",
-        "_get_files_matching_criteria[6]",
-        "_get_files_matching_criteria[yield finish]",
-        "_remove_metadatas[yield start]",
-        "_get_uncontained_keys[yield start]",
-        "_get_uncontained_keys[0]",
-        "_remove_metadatas[0]",
-        "_get_uncontained_keys[2]SKIP",
-        "_get_uncontained_keys[3]",
-        "_remove_metadatas[3]",
-        "_get_uncontained_keys[4]",
-        "_remove_metadatas[4]",
-        "_get_uncontained_keys[5]",
-        "_remove_metadatas[5]",
-        "_get_uncontained_keys[6]",
-        "_remove_metadatas[6]",
-        "_get_uncontained_keys[yield finish]",
-        "_remove_metadatas[yield finish]",
-        "_create_backups[yield start]",
-        "_get_backup_list[yield start]",
-        "_get_backup_list[0]",
-        "_create_backups[0]",
-        "_update_metadata[0]",
-        "_get_backup_list[2]",
-        "_create_backups[2]",
-        "_update_metadata[2]",
-        "_get_backup_list[3]",
-        "_create_backups[3]",
-        "_update_metadata[3]",
-        "_get_backup_list[4]SKIP",
-        "_get_backup_list[5]",
-        "_create_backups[5]SKIP",
-        "_get_backup_list[6]",
-        "_create_backups[6]",
-        "_update_metadata[6]",
-        "_get_backup_list[yield finish]",
-        "_create_backups[yield finish]",
-        "_remove_backups[yield start]",
-        "_get_discard_list[yield start]",
-        "_get_discard_list[0]",
-        "_remove_backups[7-0]",
-        "_get_discard_list[1]",
-        "_remove_backups[7-1]SKIP",
-        "_get_discard_list[2]",
-        "_remove_backups[7-2]",
-        "_get_discard_list[yield finish]",
-        "_remove_backups[yield finish]",
-    ]
+    assert actual_called == {
+        "_get_files_matching_criteria": 6,
+        "_remove_metadatas": 5,
+        "_get_uncontained_keys": 5,
+        "_create_backups": 4,
+        "_get_backup_list": 5,
+        "_update_metadata": 4,
+        "_remove_backups": 2,
+        "_get_discard_list": 3,
+    }
+    assert actual_called_skip == {
+        "_get_files_matching_criteria": 1,
+        "_remove_metadatas": 0,
+        "_get_uncontained_keys": 1,
+        "_create_backups": 1,
+        "_get_backup_list": 1,
+        "_update_metadata": 0,
+        "_remove_backups": 1,
+        "_get_discard_list": 0,
+    }
     assert actual_args == {
         "_get_files_matching_criteria": ("dict",),
         "_remove_metadatas": ("generator",),
