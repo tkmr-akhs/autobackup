@@ -79,22 +79,6 @@ class MetadataRepository:
             yield Metadata(key, mtime)
         cur.close()
 
-    def get_uncontained_keys(self, keys: list[str]) -> Generator[str]:
-        """Extracts keys that are present in this repository but not in the given list.
-
-        Keys that are only contained in the given list will be ignored.
-
-        Args:
-            keys (list[str]): List of keys to compare against
-
-        Yields:
-            str: Key that are present in this repository but not in the given list
-        """
-        current_list = self.get_all_metadatas()
-        for mdata in current_list:
-            if not mdata.key in keys:
-                yield mdata.key
-
     def remove_metadata(self, key: str, do_commit: bool = True) -> Metadata:
         """Remove the specified metadata from this repository.
 

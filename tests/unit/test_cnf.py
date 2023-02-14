@@ -57,6 +57,20 @@ def test_validate_app_cnf_IfVarDirpathIsEmptyStrThenRaiseNoException():
     assert not cnf_error is None
 
 
+def test_validate_app_cnf_IfDistinationDirNameIsAbsolutePathThenRaiseNoException():
+    # Arrange
+    app_cnf = {
+        "common": {"destination_dir": "/a", "tmp_dirpath": "a", "var_dirpath": "a"}
+    }
+
+    # Act
+    with pytest.raises(cnf.CnfError) as cnf_error:
+        cnf.validate_app_cnf(app_cnf)
+
+    # Assert
+    assert not cnf_error is None
+
+
 def test_merge_cnf_CliCnfTakePrecedenceOverUsrCnf():
     # Arrange
     app_cnf = {}
@@ -263,7 +277,7 @@ def test_Configuration_get_app_cnf_ReturnExpectedCnf():
 
 def test_Configuration_get_app_cnf_IfInitWithNoneThenReturnExpectedCnf():
     # Arrange & Act
-    cnf_loader = cnf.ConfigurationLoader("tests/data/cnf", None, None, None)
+    cnf_loader = cnf.ConfigurationLoader("tests/data/cnf", None, None, None, None)
     actual = cnf_loader.get_app_cnf({"common": {"cli_cnf_test": "Test"}})
 
     # Assert

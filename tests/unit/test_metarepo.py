@@ -70,30 +70,6 @@ def test_MetadataRepository_get_metadata_IfNotContainedThenReturnNone():
     assert actual == None
 
 
-def test_MetadataRepository_get_inexistent_metadatas_ReturnRecordsToBeRemoved():
-    # Arrange
-    dbconn = sqlite3.connect(":memory:")
-    fidb = metarepo.MetadataRepository(dbconn)
-    cur = dbconn.cursor()
-    cur.execute(
-        f"INSERT INTO {metarepo._TABLE_NAME}({metarepo._PATH_COL_NAME},{metarepo._MTIME_COL_NAME})\
-            VALUES ('/path/to/file1.ext',0.0)"
-    )
-    cur.execute(
-        f"INSERT INTO {metarepo._TABLE_NAME}({metarepo._PATH_COL_NAME},{metarepo._MTIME_COL_NAME})\
-            VALUES ('/path/to/file2.ext',0.0)"
-    )
-    dbconn.commit()
-
-    new_info = {"/path/to/file1.ext": None}
-
-    # Act
-    actual = [(item) for item in fidb.get_uncontained_keys(new_info.keys())]
-
-    # Assert
-    assert set(actual) == set(["/path/to/file2.ext"])
-
-
 def test_MetadataRepository_remove_metadatas_RemoveRecords(caplog):
     # Arrange
     caplog.set_level(DEBUG)
