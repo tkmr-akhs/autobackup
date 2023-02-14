@@ -8,9 +8,67 @@ import platform
 import shutil
 import subprocess
 
-import tests.testutil as testutil
 from autobackup.fsutil import FoundFile
 from autobackup.scanner import AllFileScanner
+import tests.testutil as testutil
+
+
+def pytest_generate_tests(metafunc):
+    if "test_prarams_for_get_discard_list" in metafunc.fixturenames:
+        metafunc.parametrize(
+            "test_prarams_for_get_discard_list",
+            list(_build_test_params_for_get_discard_list()),
+        )
+
+
+def _build_test_params_for_get_discard_list() -> list[
+    tuple[datetime.date, dict[str, FoundFile], list[FoundFile]]
+]:
+    # ---------------------------------------------------------------------------------
+    # If today is 1/23 on 2023 and the mtime of the file is from 2023-01-7 to 2023-01-10,
+    today = datetime.date(2023, 1, 23)
+    dst_files_in_date_range = testutil.dummy_found_files.get_files_in_date_range(
+        datetime.date(2023, 1, 7), datetime.date(2023, 1, 11), dst_dirname=".old"
+    )
+    dst_files = {}
+    for _, dst_files_in_date in dst_files_in_date_range.items():
+        dst_files.update(dst_files_in_date)
+    # 1/7 and 1/8 are discarded, leaving the latest files. Files after that date are kept.
+    expected = []
+    expected.extend(
+        testutil.dummy_found_files.get_files_exclude_latest(
+            dst_files_in_date_range[datetime.date(2023, 1, 7)]
+        )
+    )
+    expected.extend(
+        testutil.dummy_found_files.get_files_exclude_latest(
+            dst_files_in_date_range[datetime.date(2023, 1, 8)]
+        )
+    )
+    yield (today, dst_files, expected)
+
+    # ---------------------------------------------------------------------------------
+    # If today is 1/22 on 2023 and the mtime of the file is from 2022-12-31 to 2023-01-10,
+    today = datetime.date(2023, 1, 22)
+    dst_files_in_date_range = testutil.dummy_found_files.get_files_in_date_range(
+        datetime.date(2022, 12, 31), datetime.date(2023, 1, 11), dst_dirname=".old"
+    )
+    dst_files = {}
+    for _, dst_files_in_date in dst_files_in_date_range.items():
+        dst_files.update(dst_files_in_date)
+    # 12/31 and 1/1 are discarded, leaving the latest files. Files after that date are kept.
+    expected = []
+    expected.extend(
+        testutil.dummy_found_files.get_files_exclude_latest(
+            dst_files_in_date_range[datetime.date(2022, 12, 31)]
+        )
+    )
+    expected.extend(
+        testutil.dummy_found_files.get_files_exclude_latest(
+            dst_files_in_date_range[datetime.date(2023, 1, 1)]
+        )
+    )
+    yield (today, dst_files, expected)
 
 
 @pytest.fixture
@@ -298,31 +356,12 @@ def testdata_stale_noseq() -> None:
 
 @pytest.fixture
 def FoundFileMock():
-    class _FoundFileMock(FoundFile):
-        def __init__(
-            self, filepath: str, scan_root_dirpath: str = None, mtime: float = 0.0
-        ) -> None:
-            super().__init__(filepath, scan_root_dirpath)
-            self._mtime = mtime
-
-        @property
-        def mtime(self) -> float:
-            return self._mtime
-
-    return _FoundFileMock
+    return testutil.FoundFileMock
 
 
 @pytest.fixture
 def AllFileScannerMock():
-    class _AllFileScannerMock(AllFileScanner):
-        def __init__(self, targets=None, all_files: dict[str, FoundFile] = {}) -> None:
-            super().__init__(targets)
-            self._all_files = all_files
-
-        def get_all_files(self) -> dict[str, FoundFile]:
-            return self._all_files
-
-    return _AllFileScannerMock
+    return testutil.AllFileScannerMock
 
 
 @pytest.fixture

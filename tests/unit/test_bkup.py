@@ -6,6 +6,9 @@ import os
 import sqlite3
 import sys
 
+from tests.testutil import build_path
+
+from collections.abc import Generator
 from os import sep
 from autobackup import bkup, dstrepo, fsutil, metarepo, scanner, srcrepo
 
@@ -71,6 +74,20 @@ def test_BackupFacade_get_discard_list_IfNotBackupedFileThenNotContainIt(
 
     # Assert
     assert actual == []
+
+
+def test_BackupFacade_get_discard_list_Phase1Test(test_prarams_for_get_discard_list):
+    # Arrange
+    # mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
+    today, all_files, expected = test_prarams_for_get_discard_list
+    d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+    fcd = bkup.BackupFacade(None, d_repo, None, None)
+
+    # Act
+    actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
+
+    # Assert
+    assert set(actual) == set(expected)
 
 
 def test_BackupFacade_get_discard_list_IfFileInfoIsPhase1ThenReturnDiscardList(
