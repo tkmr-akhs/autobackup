@@ -18,14 +18,33 @@ class AllFileScannerMock(AllFileScanner):
 
 class FoundFileMock(FoundFile):
     def __init__(
-        self, filepath: str, scan_root_dirpath: str = None, mtime: float = 0.0
+        self,
+        filepath: str,
+        scan_root_dirpath: str = None,
+        mtime: float = 0.0,
+        is_hidden_flag: bool = False,
     ) -> None:
         super().__init__(filepath, scan_root_dirpath)
         self._mtime = mtime
+        self._is_hidden_flag = is_hidden_flag
 
     @property
     def mtime(self) -> float:
         return self._mtime
+
+    def is_hidden(self) -> bool:
+        import platform
+
+        pf = platform.system()
+
+        if pf == "Windows":
+            return self._is_hidden_flag
+
+        if pf == "Darwin":
+            return self._is_hidden_flag or self.name.startswith(".")
+
+        if pf == "Linux":
+            return self.name.startswith(".")
 
 
 def rscan(scan_root: str):
@@ -486,29 +505,40 @@ class testpath:
         )
 
 
-class dummy_found_files:
+class dummyfile:
     @classmethod
     def get_file(
         cls,
-        mtime_datetime: datetime.datetime,
-        path_to_dir: str = "path_to_dir",
-        dst_dirname: str = None,
-        file_prefix: str = "file",
-        file_suffix: str = ".ext",
-        strftime: str = "_%Y-%m-%d",
+        path: str,
+        *dirs: str,
+        file_prefix: str = "TestFile",
+        file_suffix: str = "",
+        strftime: str = None,
         seq: int = 0,
         seq_num_sep: str = None,
+        mtime: float = 0.0,
+        is_hidden_flag: bool = False,
     ) -> FoundFile:
         if not seq_num_sep is None:
             seq_str = seq_num_sep + str(seq).zfill(4)
+        else:
+            seq_str = ""
+
+        if not strftime is None:
+            mtime_str = datetime.datetime.fromtimestamp(mtime).strftime(strftime)
+        else:
+            mtime_str = ""
+
         file = FoundFileMock(
             build_path(
-                path_to_dir,
-                dst_dirname,
-                file=f"{file_prefix}{mtime_datetime.strftime(strftime)}{seq_str}{file_suffix}",
+                path,
+                *dirs,
+                file=f"{file_prefix}{mtime_str}{seq_str}{file_suffix}",
+                norm_path=False,
             ),
-            None,
-            mtime_datetime.timestamp(),
+            path,
+            mtime,
+            is_hidden_flag,
         )
 
         return file
@@ -517,10 +547,10 @@ class dummy_found_files:
     def get_files(
         cls,
         mtime_date: datetime.date,
-        path_to_dir: str = "path_to_dir",
-        dst_dirname: str = None,
-        file_prefix: str = "file",
-        file_suffix: str = ".ext",
+        path: str,
+        *dirs: str,
+        file_prefix: str = "TestFile",
+        file_suffix: str = "",
         strftime: str = "_%Y-%m-%d",
         seq_num: int = 3,
         seq_num_sep: str = "_",
@@ -529,17 +559,19 @@ class dummy_found_files:
 
         for seq in range(0, seq_num):
             dst_file = cls.get_file(
-                datetime.datetime(
-                    mtime_date.year, mtime_date.month, mtime_date.day, 0, 0, 0
-                )
-                + datetime.timedelta(seconds=seq),
-                path_to_dir,
-                dst_dirname,
-                file_prefix,
-                file_suffix,
-                strftime,
-                seq,
-                seq_num_sep,
+                path,
+                *dirs,
+                file_prefix=file_prefix,
+                file_suffix=file_suffix,
+                strftime=strftime,
+                seq=seq,
+                seq_num_sep=seq_num_sep,
+                mtime=(
+                    datetime.datetime(
+                        mtime_date.year, mtime_date.month, mtime_date.day, 0, 0, 0
+                    )
+                    + datetime.timedelta(seconds=seq)
+                ).timestamp(),
             )
             if seq % 2 == 0:
                 result[dst_file.normpath_str] = dst_file
@@ -556,10 +588,10 @@ class dummy_found_files:
         cls,
         mtime_date_start: datetime.date,
         mtime_date_limit: datetime.date,
-        path_to_dir: str = "path_to_dir",
-        dst_dirname: str = None,
-        file_prefix: str = "file",
-        file_suffix: str = ".ext",
+        path: str,
+        *dirs: str,
+        file_prefix: str = "TestFile",
+        file_suffix: str = "",
         strftime: str = "_%Y-%m-%d",
         seq_num: int = 3,
         seq_num_sep: str = "_",
@@ -570,13 +602,13 @@ class dummy_found_files:
         while target_date < mtime_date_limit:
             result[target_date] = cls.get_files(
                 target_date,
-                path_to_dir,
-                dst_dirname,
-                file_prefix,
-                file_suffix,
-                strftime,
-                seq_num,
-                seq_num_sep,
+                path,
+                *dirs,
+                file_prefix=file_prefix,
+                file_suffix=file_suffix,
+                strftime=strftime,
+                seq_num=seq_num,
+                seq_num_sep=seq_num_sep,
             )
             target_date += one_day_delta
 
@@ -595,7 +627,7 @@ class dummy_found_files:
         return result
 
     @classmethod
-    def get_files_exclude_latest(
+    def extract_files_exclude_latest(
         cls, dst_files: dict[str, FoundFile]
     ) -> list[FoundFile]:
         result = []
@@ -609,5 +641,34 @@ class dummy_found_files:
                 latest = file
             else:
                 result.append(file)
+
+        return result
+
+    @classmethod
+    def extract_files_exclude_latest_per_day(
+        cls,
+        date_file_dict: dict[datetime.date, dict[str, FoundFile]],
+        mtime_date_start: datetime.date,
+        mtime_date_limit: datetime.date,
+    ) -> list[FoundFile]:
+        result = []
+        for date, item in date_file_dict.items():
+            if mtime_date_start <= date and date < mtime_date_limit:
+                result.extend(cls.extract_files_exclude_latest(item))
+
+        return result
+
+    @classmethod
+    def concat(
+        cls,
+        date_file_dict: dict[datetime.date, dict[str, FoundFile]],
+        mtime_date_start: datetime.date,
+        mtime_date_limit: datetime.date,
+    ) -> dict[str, FoundFile]:
+        result = {}
+
+        for date, item in date_file_dict.items():
+            if mtime_date_start <= date and date < mtime_date_limit:
+                result.update(item)
 
         return result

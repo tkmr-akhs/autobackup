@@ -79,6 +79,8 @@ class BackupFacade:
             )
             for _ in self._d_repo.remove_backups(discard_list):
                 pass
+        else:
+            pass
 
     def _get_uncontained_keys(self, keys: list[str]) -> Generator[str]:
         """Extracts keys that are present in MetadataRepository but not in the given list.
