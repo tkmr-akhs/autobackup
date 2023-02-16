@@ -8,9 +8,9 @@ from autobackup import scanner, srcrepo
 
 
 def test_SourceRepository_get_current_files_IfTragetDirThenReturnFoundFileInfoDict(
-    testdata, build_path
+    dummy_testdata, build_path
 ):
-    target_path = testdata(__name__)
+    target_path, all_files = dummy_testdata
     key1 = build_path(target_path, "testdir1", file="testfile11")
     key2 = build_path(target_path, "testdir1", file="testfile12.ext")
 
@@ -24,13 +24,13 @@ def test_SourceRepository_get_current_files_IfTragetDirThenReturnFoundFileInfoDi
         }
     ]
 
-    scnr = srcrepo.SourceRepository(
-        scanner.AllFileScanner(targets),
+    s_repo = srcrepo.SourceRepository(
+        None,
         targets,
         ".old",
     )
 
-    file_list = dict(scnr.get_files_matching_criteria())
+    file_list = dict(s_repo.get_files_matching_criteria(all_files))
 
     actual1 = len(file_list)
     actual2 = str(file_list[key1].relpath)
@@ -42,9 +42,9 @@ def test_SourceRepository_get_current_files_IfTragetDirThenReturnFoundFileInfoDi
 
 
 def test_SourceRepository_get_current_files_IfTragetDirAndFilteredThenReturnFoundFileInfoDict(
-    testdata, build_path
+    dummy_testdata, build_path
 ):
-    target_path = testdata(__name__)
+    target_path, all_files = dummy_testdata
     key = build_path(target_path, "testdir1", file="testfile12.ext")
     targets = [
         {
@@ -56,8 +56,8 @@ def test_SourceRepository_get_current_files_IfTragetDirAndFilteredThenReturnFoun
         }
     ]
 
-    scnr = srcrepo.SourceRepository(scanner.AllFileScanner(targets), targets, ".old")
-    file_list = dict(scnr.get_files_matching_criteria())
+    s_repo = srcrepo.SourceRepository(None, targets, ".old")
+    file_list = dict(s_repo.get_files_matching_criteria(all_files))
 
     actual1 = len(file_list)
     actual2 = str(file_list[key].relpath)
@@ -67,9 +67,9 @@ def test_SourceRepository_get_current_files_IfTragetDirAndFilteredThenReturnFoun
 
 
 def test_SourceRepository_get_current_files_IfTragetDirAndIgnoreHiddenFileThenReturnFoundFileInfoDict(
-    testdata, build_path
+    dummy_testdata, build_path
 ):
-    target_path = testdata(__name__)
+    target_path, all_files = dummy_testdata
     key = build_path(target_path, "testdir2", file="testfile22")
     targets = [
         {
@@ -81,12 +81,12 @@ def test_SourceRepository_get_current_files_IfTragetDirAndIgnoreHiddenFileThenRe
         }
     ]
 
-    scnr = srcrepo.SourceRepository(
-        scanner.AllFileScanner(targets),
+    s_repo = srcrepo.SourceRepository(
+        None,
         targets,
         ".old",
     )
-    file_list = dict(scnr.get_files_matching_criteria())
+    file_list = dict(s_repo.get_files_matching_criteria(all_files))
 
     actual1 = len(file_list)
     actual2 = str(file_list[key].relpath)
@@ -96,9 +96,9 @@ def test_SourceRepository_get_current_files_IfTragetDirAndIgnoreHiddenFileThenRe
 
 
 def test_SourceRepository_get_current_files_IfTragetDirThenReturnEmptyDict(
-    testdata, build_path
+    dummy_testdata, build_path
 ):
-    target_path = testdata(__name__)
+    target_path, all_files = dummy_testdata
     targets = [
         {
             "path": target_path,
@@ -108,12 +108,12 @@ def test_SourceRepository_get_current_files_IfTragetDirThenReturnEmptyDict(
             "catch_link": True,
         }
     ]
-    scnr = srcrepo.SourceRepository(
-        scanner.AllFileScanner(targets),
+    s_repo = srcrepo.SourceRepository(
+        None,
         targets,
         ".old",
     )
-    file_list = dict(scnr.get_files_matching_criteria())
+    file_list = dict(s_repo.get_files_matching_criteria(all_files))
 
     actual = len(file_list)
 
@@ -121,7 +121,7 @@ def test_SourceRepository_get_current_files_IfTragetDirThenReturnEmptyDict(
 
 
 def test_SourceRepository_get_current_files_SkipDstDir(
-    caplog, testdata_fresh, build_path
+    caplog, dummy_testdata_fresh, build_path
 ):
     # Arrange
     caplog.set_level(DEBUG)
@@ -133,11 +133,11 @@ def test_SourceRepository_get_current_files_SkipDstDir(
         ("autobackup.srcrepo", DEBUG, "NOT_SRC(BkupDir): "),
     ]
 
-    target_root = testdata_fresh(__name__)
+    target_path, all_files = dummy_testdata_fresh
 
     targets = [
         {
-            "path": target_root,
+            "path": target_path,
             "catch_regex": ".*",
             "ignore_regex": "",
             "catch_hidden": True,
@@ -145,12 +145,12 @@ def test_SourceRepository_get_current_files_SkipDstDir(
         }
     ]
 
-    s_repo = srcrepo.SourceRepository(scanner.AllFileScanner(targets), targets, ".old")
+    s_repo = srcrepo.SourceRepository(None, targets, ".old")
 
     # Act
     actual1 = [
         str(file.relpath)
-        for file in dict(s_repo.get_files_matching_criteria()).values()
+        for file in dict(s_repo.get_files_matching_criteria(all_files)).values()
     ]
     actual2 = caplog.record_tuples
 
