@@ -2,14 +2,10 @@ import pytest
 import pytest_mock
 import pytest_raises
 import datetime
-import os
 import sqlite3
 import sys
-
-from tests.testutil import build_path
-
-from collections.abc import Generator
 from os import sep
+
 from autobackup import bkup, dstrepo, fsutil, metarepo, scanner, srcrepo
 
 

@@ -6,7 +6,6 @@ import re
 import shutil
 from collections.abc import Generator
 from logging import getLogger
-from typing import Any
 
 from .fsutil import FoundFile
 from .scanner import AllFileScanner

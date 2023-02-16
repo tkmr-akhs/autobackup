@@ -1,8 +1,8 @@
 """Module of BackupFacade"""
-from collections.abc import Generator
-from logging import getLogger
 import datetime
 import math
+from collections.abc import Generator
+from logging import getLogger
 from typing import Any
 
 from . import dstrepo, metarepo, scanner, srcrepo

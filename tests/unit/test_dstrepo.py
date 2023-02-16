@@ -5,7 +5,6 @@ import datetime
 from logging import DEBUG, ERROR, INFO, WARNING
 from os import sep
 
-
 from autobackup import dstrepo, fsutil, scanner
 from tests.testutil import testpath
 

@@ -6,12 +6,11 @@ import pathlib
 import platform
 import shutil
 import subprocess
-
-
 from datetime import date, datetime
-from autobackup.fsutil import FoundFile
-from autobackup.scanner import AllFileScanner
+
+
 import tests.testutil as testutil
+from autobackup.fsutil import FoundFile
 
 DUMMY_SCAN_ROOT = "/Path/To/TestDir"
 
@@ -163,7 +162,7 @@ def testpath():
 
 
 def _create_src_dummy_files() -> dict[str, FoundFile]:
-    from tests.testutil import dummyfile, build_path, TESTDATA_TIMESTAMP
+    from tests.testutil import TESTDATA_TIMESTAMP, build_path, dummyfile
 
     mtime = TESTDATA_TIMESTAMP
     target_dir = DUMMY_SCAN_ROOT
@@ -214,7 +213,7 @@ def _create_src_dummy_files() -> dict[str, FoundFile]:
 
 
 def _create_dst_dummy_files(mtime: float) -> dict[str, FoundFile]:
-    from tests.testutil import dummyfile, build_path, TESTDATA_TIMESTAMP
+    from tests.testutil import TESTDATA_TIMESTAMP, build_path, dummyfile
 
     mtime_str = datetime.fromtimestamp(mtime).strftime("_%Y-%m-%d")
     target_dir = DUMMY_SCAN_ROOT
@@ -288,7 +287,7 @@ def _create_dst_dummy_files(mtime: float) -> dict[str, FoundFile]:
 
 
 def _create_dst_dummy_files_noseq(mtime: float) -> dict[str, FoundFile]:
-    from tests.testutil import dummyfile, build_path, TESTDATA_TIMESTAMP
+    from tests.testutil import TESTDATA_TIMESTAMP, build_path, dummyfile
 
     mtime_str = datetime(mtime).strftime("_%Y-%m-%d")
     target_dir = DUMMY_SCAN_ROOT

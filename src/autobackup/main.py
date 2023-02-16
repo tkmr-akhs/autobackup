@@ -2,9 +2,9 @@
 import logging.config
 import os
 import sqlite3
-from contextlib import closing
-from logging import Logger, FileHandler, error, getLogger
 import time
+from contextlib import closing
+from logging import FileHandler, Logger, error, getLogger
 
 from .appinit import init_app
 from .bkup import BackupFacade

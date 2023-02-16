@@ -1,9 +1,10 @@
 """Module for backup source repository"""
 import os
 import re
-from _collections_abc import Generator
 from logging import getLogger
 from typing import Any
+
+from _collections_abc import Generator
 
 from . import fsutil
 from .scanner import AllFileScanner
