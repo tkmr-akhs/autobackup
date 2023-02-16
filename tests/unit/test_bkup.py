@@ -383,6 +383,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     # BackupFacade
     scnr = scanner.AllFileScanner(
         None,
+        False,
         {
             "0": fsutil.FoundFile("0"),
             "1": fsutil.FoundFile("1"),

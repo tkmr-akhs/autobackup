@@ -12,17 +12,11 @@ def test_AllFileScanner_get_all_files_(testdata_fresh):
     target_root = testdata_fresh(__name__)
 
     targets = [
-        {
-            "path": testpath.src_testdir1_path(target_root, norm_path=False),
-            "catch_link": False,
-        },
-        {
-            "path": testpath.src_testdir2_path(target_root, norm_path=False),
-            "catch_link": False,
-        },
+        testpath.src_testdir1_path(target_root, norm_path=False),
+        testpath.src_testdir2_path(target_root, norm_path=False),
     ]
 
-    scnr = scanner.AllFileScanner(targets)
+    scnr = scanner.AllFileScanner(targets, False)
 
     # Act
     actual = [str(file.relpath) for key, file in scnr.get_all_files().items()]
