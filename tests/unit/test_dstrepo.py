@@ -419,7 +419,7 @@ def test_DestinationRepository_get_current_backups_GetCurrentBackups(
     )
 
     d_repo = dstrepo.DestinationRepository(
-        scanner.AllFileScanner([{"path": target_root, "catch_link": False}]),
+        scanner.AllFileScanner([target_root], False),
         ".old",
         "_%Y-%m-%d",
         "_",
