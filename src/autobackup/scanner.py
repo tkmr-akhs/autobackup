@@ -7,13 +7,14 @@ from . import fsutil
 class AllFileScanner:
     """Get files in directories"""
 
-    def __init__(self, targets: list[dict[str, Any]]) -> None:
+    def __init__(self, target_dirs: list[str], scan_symlink_dir: bool) -> None:
         """Initializer
 
         Args:
             targets (list[dict[str, Any]]): Scan target directories
         """
-        self._targets = targets
+        self._target_dirs = target_dirs
+        self._scan_symlink_dir = scan_symlink_dir
 
     def get_all_files(self) -> dict[str, fsutil.FoundFile]:
         """Get files in directories.
@@ -23,10 +24,10 @@ class AllFileScanner:
         """
         result = {}
         r_scanner = fsutil.RecursiveScanDir()
-        for target in self._targets:
-            target_path = target["path"]
-            catch_link = target["catch_link"]
-            found_files = r_scanner.recursive_scandir(target_path, catch_link)
+        for target_path in self._target_dirs:
+            found_files = r_scanner.recursive_scandir(
+                target_path, self._scan_symlink_dir
+            )
             for file in found_files:
                 result[file.normpath_str] = file
 

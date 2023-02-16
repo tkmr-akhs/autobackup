@@ -37,6 +37,7 @@ class BackupRepositoryFactory:
         dst_dir_name: str,
         datetime_format: str,
         seq_num_sep: str = "_",
+        scan_symlink_dir: bool = False,
     ) -> None:
         """Initializer
 
@@ -54,7 +55,9 @@ class BackupRepositoryFactory:
         self._dst_dir_name = dst_dir_name
         self._datetime_format = datetime_format
         self._seq_num_sep = seq_num_sep
-        self._scanner = AllFileScanner(targets)
+        self._scanner = AllFileScanner(
+            [target["path"] for target in targets], scan_symlink_dir
+        )
 
     def get_source_repository(self) -> SourceRepository:
         """Get SourceRepository object.

@@ -179,6 +179,11 @@ def get_cli_cnf(args: list[str]) -> dict[str, Any]:
         '{"path": "path/to/dir", "catch_regex": ".*", "ignore_regex": "", "catch_hidden": true, "catch_link": false}',
     )
     parser.add_argument(
+        "--scan_symlink_dir",
+        type=bool,
+        help="Whether scan symbolic link directory or not.",
+    )
+    parser.add_argument(
         "--discard_old_backup",
         type=bool,
         help="Whether discard old backup or not.",

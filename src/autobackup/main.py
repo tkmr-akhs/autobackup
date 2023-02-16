@@ -68,6 +68,7 @@ class Main:
             self._app_cnf["common"]["destination_dir"],
             self._app_cnf["common"]["datetime_format"],
             self._seq_num_sep,
+            self._app_cnf["common"]["scan_symlink_dir"],
         )
         s_repo = b_factory.get_source_repository()
         d_repo = b_factory.get_destination_repository()

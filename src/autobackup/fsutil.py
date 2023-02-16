@@ -22,7 +22,7 @@ class RecursiveScanDir:
         self._logger = getLogger(__name__)
 
     def _recursive_scandir(
-        self, dirpath: str, scan_root: str, catch_link: bool, found: list[str]
+        self, dirpath: str, scan_root: str, scan_symlink_dir: bool, found: list[str]
     ) -> Generator["FoundFile"]:
         for item in os.scandir(dirpath):
             item_hash = hash(os.path.normcase(os.path.realpath(item)))
@@ -34,15 +34,15 @@ class RecursiveScanDir:
 
             if item.is_dir():
                 # generator function
-                if not (not catch_link and item.is_symlink()):
+                if not (not scan_symlink_dir and item.is_symlink()):
                     yield from self._recursive_scandir(
-                        item.path, scan_root, catch_link, found
+                        item.path, scan_root, scan_symlink_dir, found
                     )
             else:
                 yield FoundFile(item.path, scan_root)
 
     def recursive_scandir(
-        self, dirpath: str = ".", catch_link: bool = True
+        self, dirpath: str = ".", scan_symlink_dir: bool = True
     ) -> Generator["FoundFile"]:
         """Scan directory recursively.
 
@@ -54,7 +54,7 @@ class RecursiveScanDir:
         Yields:
             FoundFile: FoundFile object pointing to the path of file.
         """
-        yield from self._recursive_scandir(dirpath, dirpath, catch_link, [])
+        yield from self._recursive_scandir(dirpath, dirpath, scan_symlink_dir, [])
 
 
 class FoundFile(os.PathLike):
