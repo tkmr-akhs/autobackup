@@ -65,8 +65,8 @@ class BackupFacade:
             pass
 
         # Create backups and Update Metadata
-        updated_files = self._get_updated_files(src_files)
-        processed_files = self._d_repo.create_backups(updated_files)
+        modified_files = self._get_modified_files(src_files)
+        processed_files = self._d_repo.create_backups(modified_files)
         for src_file, dst_file in processed_files:
             self._m_repo.update_metadata(
                 metarepo.Metadata(src_file.normpath_str, src_file.mtime)
@@ -98,7 +98,7 @@ class BackupFacade:
             if not mdata.key in keys:
                 yield mdata.key
 
-    def _get_updated_files(
+    def _get_modified_files(
         self, file_dict: dict[str, FoundFile]
     ) -> Generator[FoundFile]:
         """Get a list of files that need to be backed up.

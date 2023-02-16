@@ -143,7 +143,7 @@ def test_BackupFacade_get_update_list_ReturnRecordsToBeUpdated(
     fcd = bkup.BackupFacade(None, None, m_repo, None)
 
     # Act
-    actual = [found_file for found_file in fcd._get_updated_files(file_dict)]
+    actual = [found_file for found_file in fcd._get_modified_files(file_dict)]
 
     # Assert
     assert set(actual) == set([found_file2])
@@ -238,7 +238,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     )
 
     # STEP 4
-    def _get_updated_files(x):
+    def _get_modified_files(x):
         nonlocal actual_called
         nonlocal actual_called_skip
         nonlocal actual_args
@@ -260,8 +260,8 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
                 yield value
 
     mocker.patch(
-        "autobackup.bkup.BackupFacade._get_updated_files",
-        side_effect=_get_updated_files,
+        "autobackup.bkup.BackupFacade._get_modified_files",
+        side_effect=_get_modified_files,
     )
 
     # STEP 5
@@ -418,7 +418,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
         "_remove_metadatas": 5,
         "_get_uncontained_keys": 5,
         "_create_backups": 4,
-        "_get_updated_files": 5,
+        "_get_modified_files": 5,
         "_update_metadata": 4,
         "_remove_backups": 2,
         "_get_files_to_be_discarded": 3,
@@ -428,7 +428,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
         "_remove_metadatas": 0,
         "_get_uncontained_keys": 1,
         "_create_backups": 1,
-        "_get_updated_files": 1,
+        "_get_modified_files": 1,
         "_update_metadata": 0,
         "_remove_backups": 1,
         "_get_files_to_be_discarded": 0,
@@ -438,7 +438,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
         "_remove_metadatas": ("generator",),
         "_get_uncontained_keys": ("dict_keys",),
         "_create_backups": ("generator",),
-        "_get_updated_files": ("dict",),
+        "_get_modified_files": ("dict",),
         "_update_metadata": ("Metadata",),
         "_remove_backups": ("generator",),
         "_get_files_to_be_discarded": ("dict", "int", "int"),
