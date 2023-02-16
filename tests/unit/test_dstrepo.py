@@ -461,8 +461,8 @@ def test_DestinationRepository_remove_backups_DiscardBackup(
     # Arrange
     caplog.set_level(DEBUG)
     expected_logs = [
-        ("autobackup.dstrepo", WARNING, "DELETE_OLD_FILE: "),
-        ("autobackup.dstrepo", WARNING, "DELETE_OLD_FILE: "),
+        ("autobackup.dstrepo", WARNING, "DELETE_FILE: "),
+        ("autobackup.dstrepo", WARNING, "DELETE_FILE: "),
     ]
     target_root = testdata_fresh(__name__)
 
