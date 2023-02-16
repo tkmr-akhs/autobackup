@@ -13,6 +13,8 @@ from autobackup.fsutil import FoundFile
 from autobackup.scanner import AllFileScanner
 import tests.testutil as testutil
 
+DUMMY_SCAN_ROOT = "/Path/To/TestDir"
+
 
 def pytest_generate_tests(metafunc):
     if "test_prarams_for_get_discard_list" in metafunc.fixturenames:
@@ -39,35 +41,35 @@ def dummyfile():
 
 @pytest.fixture
 def dummy_testdata():
-    return _create_src_dummy_files()
+    return (DUMMY_SCAN_ROOT, _create_src_dummy_files())
 
 
 @pytest.fixture
 def dummy_testdata_fresh():
-    return _create_src_dummy_files().update(
-        _create_dst_dummy_files(testutil.TESTDATA_TIMESTAMP)
-    )
+    result = _create_src_dummy_files()
+    result.update(_create_dst_dummy_files(testutil.TESTDATA_TIMESTAMP))
+    return (DUMMY_SCAN_ROOT, result)
 
 
 @pytest.fixture
 def dummy_testdata_fresh_noseq():
-    return _create_src_dummy_files().update(
-        _create_dst_dummy_files_noseq(testutil.TESTDATA_TIMESTAMP)
-    )
+    result = _create_src_dummy_files()
+    result.update(_create_dst_dummy_files_noseq(testutil.TESTDATA_TIMESTAMP))
+    return (DUMMY_SCAN_ROOT, result)
 
 
 @pytest.fixture
 def dummy_testdata_satle():
-    return _create_src_dummy_files().update(
-        _create_dst_dummy_files(testutil.TESTDATA_TIMESTAMP - 0.001)
-    )
+    result = _create_src_dummy_files()
+    result.update(_create_dst_dummy_files(testutil.TESTDATA_TIMESTAMP - 0.001))
+    return (DUMMY_SCAN_ROOT, result)
 
 
 @pytest.fixture
 def dummy_testdata_stale_noseq():
-    return _create_src_dummy_files().update(
-        _create_dst_dummy_files_noseq(testutil.TESTDATA_TIMESTAMP - 0.001)
-    )
+    result = _create_src_dummy_files()
+    result.update(_create_dst_dummy_files_noseq(testutil.TESTDATA_TIMESTAMP - 0.001))
+    return _create_src_dummy_files(DUMMY_SCAN_ROOT, result)
 
 
 @pytest.fixture
@@ -164,7 +166,7 @@ def _create_src_dummy_files() -> dict[str, FoundFile]:
     from tests.testutil import dummyfile, build_path, TESTDATA_TIMESTAMP
 
     mtime = TESTDATA_TIMESTAMP
-    target_dir = "/Path/To/TestData"
+    target_dir = DUMMY_SCAN_ROOT
     src_testfile_key = build_path(target_dir, file="testfile")
     src_testfile = dummyfile.get_file(
         target_dir,
@@ -214,33 +216,36 @@ def _create_src_dummy_files() -> dict[str, FoundFile]:
 def _create_dst_dummy_files(mtime: float) -> dict[str, FoundFile]:
     from tests.testutil import dummyfile, build_path, TESTDATA_TIMESTAMP
 
-    mtime_str = datetime(mtime).strftime("_%Y-%m-%d")
-    target_dir = "/Path/To/TestData"
+    mtime_str = datetime.fromtimestamp(mtime).strftime("_%Y-%m-%d")
+    target_dir = DUMMY_SCAN_ROOT
     dst_testfile_key = build_path(target_dir, ".old", file=f"testfile{mtime_str}_0000")
     dst_testfile = dummyfile.get_file(
         target_dir,
+        ".old",
         file_prefix="TestFile",
         strftime="_%Y-%m-%d",
         seq_num_sep="_",
         mtime=mtime,
     )
     dst_testfile11_key = build_path(
-        target_dir, ".old", "testdir1", file=f"testfile11{mtime_str}_0000"
+        target_dir, "testdir1", ".old", file=f"testfile11{mtime_str}_0000"
     )
     dst_testfile11 = dummyfile.get_file(
         target_dir,
         "TestDir1",
+        ".old",
         file_prefix="TestFile11",
         strftime="_%Y-%m-%d",
         seq_num_sep="_",
         mtime=mtime,
     )
     dst_testfile12_key = build_path(
-        target_dir, ".old", "testdir1", file=f"testfile12{mtime_str}_0000.ext"
+        target_dir, "testdir1", ".old", file=f"testfile12{mtime_str}_0000.ext"
     )
     dst_testfile12 = dummyfile.get_file(
         target_dir,
         "TestDir1",
+        ".old",
         file_prefix="TestFile12",
         file_suffix=".ext",
         strftime="_%Y-%m-%d",
@@ -248,11 +253,12 @@ def _create_dst_dummy_files(mtime: float) -> dict[str, FoundFile]:
         mtime=mtime,
     )
     dst_testfile21_key = build_path(
-        target_dir, ".old", "testdir2", file=f".testfile21{mtime_str}_0000"
+        target_dir, "testdir2", ".old", file=f".testfile21{mtime_str}_0000"
     )
     dst_testfile21 = dummyfile.get_file(
         target_dir,
         "TestDir2",
+        ".old",
         file_prefix=".TestFile21",
         strftime="_%Y-%m-%d",
         seq_num_sep="_",
@@ -260,11 +266,12 @@ def _create_dst_dummy_files(mtime: float) -> dict[str, FoundFile]:
         is_hidden_flag=True,
     )
     dst_testfile22_key = build_path(
-        target_dir, ".old", "testdir2", file=f"testfile22{mtime_str}_0000"
+        target_dir, "testdir2", ".old", file=f"testfile22{mtime_str}_0000"
     )
     dst_testfile22 = dummyfile.get_file(
         target_dir,
         "TestDir2",
+        ".old",
         file_prefix="TestFile22",
         strftime="_%Y-%m-%d",
         seq_num_sep="_",
@@ -284,7 +291,7 @@ def _create_dst_dummy_files_noseq(mtime: float) -> dict[str, FoundFile]:
     from tests.testutil import dummyfile, build_path, TESTDATA_TIMESTAMP
 
     mtime_str = datetime(mtime).strftime("_%Y-%m-%d")
-    target_dir = "/Path/To/TestData"
+    target_dir = DUMMY_SCAN_ROOT
     dst_testfile_key = build_path(target_dir, ".old", file=f"testfile{mtime_str}")
     dst_testfile = dummyfile.get_file(
         target_dir,
@@ -557,7 +564,7 @@ def _build_test_params_for_get_discard_list() -> list[
 ]:
     from tests.testutil import dummyfile
 
-    TARGET_PATH = "/Path/To/TestDir"
+    TARGET_PATH = DUMMY_SCAN_ROOT
 
     # ---------------------------------------------------------------------------------
     # If today is 1/23 on 2023 and the mtime of the file is from 2023-01-7 to 2023-01-10,

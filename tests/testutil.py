@@ -8,8 +8,13 @@ TESTDATA_TIMESTAMP = datetime.datetime(2023, 1, 23, 4, 56, 12, 345678).timestamp
 
 
 class AllFileScannerMock(AllFileScanner):
-    def __init__(self, targets=None, all_files: dict[str, FoundFile] = {}) -> None:
-        super().__init__(targets)
+    def __init__(
+        self,
+        targets=None,
+        scan_symlink_dir: bool = False,
+        all_files: dict[str, FoundFile] = {},
+    ) -> None:
+        super().__init__(targets, scan_symlink_dir)
         self._all_files = all_files
 
     def get_all_files(self) -> dict[str, FoundFile]:
