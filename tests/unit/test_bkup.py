@@ -44,7 +44,7 @@ def test_BackupFacade_get_discard_list_IfFileInfoIsEmptyThenReturnEmptyList():
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
     # Act
-    actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
+    actual = [item for item in fcd._get_files_to_be_discarded(all_files, today, 2, 2)]
 
     # Assert
     assert actual == []
@@ -66,7 +66,7 @@ def test_BackupFacade_get_discard_list_IfNotBackupedFileThenNotContainIt(
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
     # Act
-    actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
+    actual = [item for item in fcd._get_files_to_be_discarded(all_files, today, 2, 2)]
 
     # Assert
     assert actual == []
@@ -82,7 +82,7 @@ def test_BackupFacade_get_discard_list_ReturnCorrectList(
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
     # Act
-    actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
+    actual = [item for item in fcd._get_files_to_be_discarded(all_files, today, 2, 2)]
 
     # Assert
     assert set(actual) == set(expected)
@@ -107,7 +107,7 @@ def test_BackupFacade_get_discard_list_IfSeqNumFlagIsDisabledThenReturnDiscardLi
     fcd = bkup.BackupFacade(None, d_repo, None, None)
 
     # Act
-    actual = [item for item in fcd._get_discard_list(all_files, today, 2, 2)]
+    actual = [item for item in fcd._get_files_to_be_discarded(all_files, today, 2, 2)]
 
     # Assert
     assert set(actual) == set(expected)
@@ -143,7 +143,7 @@ def test_BackupFacade_get_update_list_ReturnRecordsToBeUpdated(
     fcd = bkup.BackupFacade(None, None, m_repo, None)
 
     # Act
-    actual = [found_file for found_file in fcd._get_backup_list(file_dict)]
+    actual = [found_file for found_file in fcd._get_updated_files(file_dict)]
 
     # Assert
     assert set(actual) == set([found_file2])
@@ -238,7 +238,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     )
 
     # STEP 4
-    def _get_backup_list(x):
+    def _get_updated_files(x):
         nonlocal actual_called
         nonlocal actual_called_skip
         nonlocal actual_args
@@ -260,8 +260,8 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
                 yield value
 
     mocker.patch(
-        "autobackup.bkup.BackupFacade._get_backup_list",
-        side_effect=_get_backup_list,
+        "autobackup.bkup.BackupFacade._get_updated_files",
+        side_effect=_get_updated_files,
     )
 
     # STEP 5
@@ -315,7 +315,7 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
     )
 
     # STEP 7
-    def _get_discard_list(*args, **kwargs):
+    def _get_files_to_be_discarded(*args, **kwargs):
         nonlocal actual_called
         nonlocal actual_called_skip
         nonlocal actual_args
@@ -345,8 +345,8 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
                 yield fsutil.FoundFile("7-2")
 
     mocker.patch(
-        "autobackup.bkup.BackupFacade._get_discard_list",
-        side_effect=_get_discard_list,
+        "autobackup.bkup.BackupFacade._get_files_to_be_discarded",
+        side_effect=_get_files_to_be_discarded,
     )
 
     # STEP 8
@@ -418,28 +418,28 @@ def test_BackupFacade_execute_Execute(mocker, FoundFileMock, AllFileScannerMock)
         "_remove_metadatas": 5,
         "_get_uncontained_keys": 5,
         "_create_backups": 4,
-        "_get_backup_list": 5,
+        "_get_updated_files": 5,
         "_update_metadata": 4,
         "_remove_backups": 2,
-        "_get_discard_list": 3,
+        "_get_files_to_be_discarded": 3,
     }
     assert actual_called_skip == {
         "_get_files_matching_criteria": 1,
         "_remove_metadatas": 0,
         "_get_uncontained_keys": 1,
         "_create_backups": 1,
-        "_get_backup_list": 1,
+        "_get_updated_files": 1,
         "_update_metadata": 0,
         "_remove_backups": 1,
-        "_get_discard_list": 0,
+        "_get_files_to_be_discarded": 0,
     }
     assert actual_args == {
         "_get_files_matching_criteria": ("dict",),
         "_remove_metadatas": ("generator",),
         "_get_uncontained_keys": ("dict_keys",),
         "_create_backups": ("generator",),
-        "_get_backup_list": ("dict",),
+        "_get_updated_files": ("dict",),
         "_update_metadata": ("Metadata",),
         "_remove_backups": ("generator",),
-        "_get_discard_list": ("dict", "int", "int"),
+        "_get_files_to_be_discarded": ("dict", "int", "int"),
     }

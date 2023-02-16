@@ -250,7 +250,7 @@ def test_ConfigurationLoader_get_log_cnf_ReturnExpectedCnf():
     assert set(actual) == set(["version", "loggers", "handlers", "formatters"])
 
 
-def test_Configuration_get_app_cnf_ReturnExpectedCnf():
+def test_ConfigurationLoader_get_app_cnf_ReturnExpectedCnf():
     # Arrange
     cnf_loader = cnf.ConfigurationLoader("tests/data/cnf")
 
@@ -280,7 +280,7 @@ def test_Configuration_get_app_cnf_ReturnExpectedCnf():
     )
 
 
-def test_Configuration_get_app_cnf_IfInitWithNoneThenReturnExpectedCnf():
+def test_ConfigurationLoader_get_app_cnf_IfInitWithNoneThenReturnExpectedCnf():
     # Arrange & Act
     cnf_loader = cnf.ConfigurationLoader("tests/data/cnf", None, None, None, None)
     actual = cnf_loader.get_app_cnf({"common": {"cli_cnf_test": "Test"}})

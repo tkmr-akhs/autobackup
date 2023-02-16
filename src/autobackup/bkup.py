@@ -65,19 +65,19 @@ class BackupFacade:
             pass
 
         # Create backups and Update Metadata
-        backup_list = self._get_backup_list(src_files)
-        processed_list = self._d_repo.create_backups(backup_list)
-        for src_file, dst_file in processed_list:
+        updated_files = self._get_updated_files(src_files)
+        processed_files = self._d_repo.create_backups(updated_files)
+        for src_file, dst_file in processed_files:
             self._m_repo.update_metadata(
                 metarepo.Metadata(src_file.normpath_str, src_file.mtime)
             )
 
         # Discard old backups
         if discard_old_backups:
-            discard_list = self._get_discard_list(
+            files_to_be_discarded = self._get_files_to_be_discarded(
                 all_files, phase1_weeks=phase1_weeks, phase2_months=phase2_months
             )
-            for _ in self._d_repo.remove_backups(discard_list):
+            for _ in self._d_repo.remove_backups(files_to_be_discarded):
                 pass
         else:
             pass
@@ -98,7 +98,9 @@ class BackupFacade:
             if not mdata.key in keys:
                 yield mdata.key
 
-    def _get_backup_list(self, file_dict: dict[str, FoundFile]) -> Generator[FoundFile]:
+    def _get_updated_files(
+        self, file_dict: dict[str, FoundFile]
+    ) -> Generator[FoundFile]:
         """Get a list of files that need to be backed up.
 
         Args:
@@ -118,7 +120,7 @@ class BackupFacade:
             ):
                 yield file
 
-    def _get_discard_list(
+    def _get_files_to_be_discarded(
         self,
         all_files: dict[str, FoundFile] = None,
         today: datetime.date = datetime.date.today(),
