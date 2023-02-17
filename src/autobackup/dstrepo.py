@@ -151,7 +151,9 @@ class DestinationRepository:
 
         return re.compile(result)
 
-    def get_dst_file(self, src_file: FoundFile) -> tuple[FoundFile, bool]:
+    def get_dst_file(
+        self, src_file: FoundFile, all_files: dict[str, FoundFile] = None
+    ) -> tuple[FoundFile, bool]:
         """Get the file from which the backup will be taken.
 
         Args:
@@ -173,11 +175,11 @@ class DestinationRepository:
 
         if self._seq_sep is None:
             return self._get_dst_path_without_seq(
-                src_file, dst_path, file_name, mtime_date, file_ext
+                src_file, dst_path, file_name, mtime_date, file_ext, all_files
             )
         else:
             return self._get_dst_path_with_seq(
-                src_file, dst_path, file_name, mtime_date, file_ext
+                src_file, dst_path, file_name, mtime_date, file_ext, all_files
             )
 
     def _get_dst_path_without_seq(
@@ -187,6 +189,7 @@ class DestinationRepository:
         file_name: str,
         mtime_date: str,
         file_ext: str,
+        all_files: dict[str, FoundFile],
     ):
         # Assemble the destination path from each element.
         dst_file = FoundFile(
@@ -196,7 +199,7 @@ class DestinationRepository:
 
         is_skip = False
 
-        if dst_file.exists():
+        if self._is_exist_file(dst_file, all_files):
             if dst_file.mtime == src_file.mtime:
                 # Ignore if a backup has already been taken.
                 is_skip = True
@@ -210,33 +213,45 @@ class DestinationRepository:
         file_name: str,
         mtime_date: str,
         file_ext: str,
+        all_files: dict[str, FoundFile],
     ):
         # Assemble the destination path from each element.
         seq_num = 0
-        dst_file = FoundFile(
-            self._build_dst_filepath(
-                dst_path, file_name, mtime_date, seq_num, file_ext
-            ),
-            str(src_file.scan_root_path),
+        dst_filepath = self._build_dst_filepath(
+            dst_path, file_name, mtime_date, seq_num, file_ext
         )
 
         is_skip = False
 
-        while dst_file.exists():
+        while self._is_exist_file(dst_filepath, all_files):
+            dst_file = self._build_dst_file(src_file, dst_filepath, all_files)
             if dst_file.mtime == src_file.mtime:
                 # Ignore if a backup has already been taken.
                 is_skip = True
                 break
 
             seq_num += 1
-            dst_file = FoundFile(
-                self._build_dst_filepath(
-                    dst_path, file_name, mtime_date, seq_num, file_ext
-                ),
-                str(src_file.scan_root_path),
+            dst_filepath = self._build_dst_filepath(
+                dst_path, file_name, mtime_date, seq_num, file_ext
             )
+        else:
+            dst_file = FoundFile(dst_filepath, src_file.scan_root_path)
 
         return (dst_file, is_skip)
+
+    def _is_exist_file(self, filepath: str, all_files: dict[str, FoundFile]) -> bool:
+        if all_files is None:
+            return os.path.exists(filepath)
+        else:
+            return os.path.normcase(os.path.abspath(filepath)) in all_files.keys()
+
+    def _build_dst_file(
+        self, src_file: FoundFile, dst_filepath: str, all_files: dict[str, FoundFile]
+    ) -> FoundFile:
+        if all_files is None:
+            return FoundFile(dst_filepath, src_file.scan_root_path)
+        else:
+            return all_files[os.path.normcase(os.path.abspath(dst_filepath))]
 
     def create_backup(self, src_file: FoundFile) -> tuple[FoundFile, FoundFile]:
         """Create a duplicate file for backup purposes.
