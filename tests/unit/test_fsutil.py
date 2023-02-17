@@ -7,175 +7,177 @@ from os import sep
 from autobackup import fsutil
 
 
-def test_FoundFile_init_IfScanRootIsNoneThenParentOfFile(build_path):
-    found_file = fsutil.FoundFile("/Path/To/File.ext", None)
-    expected = pathlib.Path(build_path("/Path/To", file="File.ext")).parent
+class Test_FoundFile:
+    @staticmethod
+    def test_init_IfScanRootIsNoneThenParentOfFile(build_path):
+        found_file = fsutil.FoundFile("/Path/To/File.ext", None)
+        expected = pathlib.Path(build_path("/Path/To", file="File.ext")).parent
 
-    actual = found_file.parent
+        actual = found_file.parent
 
-    assert actual == expected
+        assert actual == expected
 
+    @staticmethod
+    def test_relpath_ReturnRelpath():
+        found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
+        expected = pathlib.Path("To/File.ext")
 
-def test_FoundFile_relpath_ReturnRelpath():
-    found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
-    expected = pathlib.Path("To/File.ext")
+        actual = found_file.relpath
 
-    actual = found_file.relpath
+        assert actual == expected
 
-    assert actual == expected
+    @staticmethod
+    def test_str_ReturnAbsolutePath(drive, build_path):
+        import os
 
+        found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
+        expected = "" + drive + sep + os.path.join("path", "To", "File.ext")
 
-def test_FoundFile_str_ReturnAbsolutePath(drive, build_path):
-    import os
+        actual = str(found_file)
 
-    found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
-    expected = "" + drive + sep + os.path.join("path", "To", "File.ext")
+        assert actual == expected
 
-    actual = str(found_file)
+    @staticmethod
+    def test_normpath_ReturnNormpathStr(drive, build_path):
+        import os
 
-    assert actual == expected
+        found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
+        expected = "" + drive + sep + os.path.join("path", "to", "file.ext")
 
+        actual = found_file.normpath_str
 
-def test_FoundFile_normpath_ReturnNormpathStr(drive, build_path):
-    import os
+        assert actual == expected
 
-    found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
-    expected = "" + drive + sep + os.path.join("path", "to", "file.ext")
+    @staticmethod
+    def test_name_ReturnName():
+        found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
+        expected = "File.ext"
 
-    actual = found_file.normpath_str
+        actual = found_file.name
 
-    assert actual == expected
+        assert actual == expected
 
+    @staticmethod
+    def test_parent_ReturnParent(build_path):
+        found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path/To")
+        expected = pathlib.Path(build_path("/Path/To"))
 
-def test_FoundFile_name_ReturnName():
-    found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
-    expected = "File.ext"
+        actual = found_file.parent
 
-    actual = found_file.name
+        assert actual == expected
 
-    assert actual == expected
+    @staticmethod
+    def test_parent_ReturnParent2(build_path):
+        found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
+        expected = pathlib.Path(build_path("/Path", "To"))
 
+        actual = found_file.parent
 
-def test_FoundFile_parent_ReturnParent(build_path):
-    found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path/To")
-    expected = pathlib.Path(build_path("/Path/To"))
+        assert actual == expected
 
-    actual = found_file.parent
+    @staticmethod
+    def test_stem_ReturnStem():
+        found_file = fsutil.FoundFile("/Path/To/.File.txt")
 
-    assert actual == expected
+        actual = found_file.stem
 
+        assert actual == ".File"
 
-def test_FoundFile_parent_ReturnParent2(build_path):
-    found_file = fsutil.FoundFile("/Path/To/File.ext", "/Path")
-    expected = pathlib.Path(build_path("/Path", "To"))
+    @staticmethod
+    def test_stem_IfFileNameStartsWithDotThenReturnStem():
+        found_file = fsutil.FoundFile("/Path/To/.txt")
 
-    actual = found_file.parent
+        actual = found_file.stem
 
-    assert actual == expected
+        assert actual == ".txt"
 
+    @staticmethod
+    def test_suffix_ReturnNoSuffix():
+        found_file = fsutil.FoundFile("/Path/To/.File.txt")
 
-def test_FoundFile_stem_ReturnStem():
-    found_file = fsutil.FoundFile("/Path/To/.File.txt")
+        actual = found_file.suffix
 
-    actual = found_file.stem
+        assert actual == ".txt"
 
-    assert actual == ".File"
+    @staticmethod
+    def test_IfFileNameStartsWithDotThenReturnNoSuffix():
+        found_file = fsutil.FoundFile("/Path/To/.txt")
 
+        actual = found_file.suffix
 
-def test_FoundFile_stem_IfFileNameStartsWithDotThenReturnStem():
-    found_file = fsutil.FoundFile("/Path/To/.txt")
+        assert actual == ""
 
-    actual = found_file.stem
+    @staticmethod
+    def test_eq_IfEqualFoundFileThenReturnEquality():
+        found_file1 = fsutil.FoundFile("/Path/To/File.ext")
+        found_file2 = fsutil.FoundFile("/Path/To/File.ext")
 
-    assert actual == ".txt"
+        actual = found_file1 == found_file2
 
+        assert actual == True
 
-def test_FoundFile_suffix_ReturnNoSuffix():
-    found_file = fsutil.FoundFile("/Path/To/.File.txt")
+    @staticmethod
+    def test_eq_IfEqualFoundFileThenReturnEquality2():
+        found_file1 = fsutil.FoundFile("/Path/To/File.ext")
+        found_file2 = fsutil.FoundFile("/Other/Path/To/File.ext")
 
-    actual = found_file.suffix
+        actual = found_file1 == found_file2
 
-    assert actual == ".txt"
+        assert actual == False
 
+    @staticmethod
+    def test_eq_IfEqualFoundFileThenReturnEquality3():
+        found_file1 = fsutil.FoundFile("/Path/To/File.ext", "/Path/To")
+        found_file2 = fsutil.FoundFile("/Path/To/File.ext", "/Path")
 
-def test_FoundFile_IfFileNameStartsWithDotThenReturnNoSuffix():
-    found_file = fsutil.FoundFile("/Path/To/.txt")
+        actual = found_file1 == found_file2
 
-    actual = found_file.suffix
+        assert actual == False
 
-    assert actual == ""
+    @staticmethod
+    def test_eq_IfEqualPathThenReturnEquality():
+        found_file = fsutil.FoundFile("/Path/To/File.ext")
+        Path_obj = pathlib.Path("/Path/To/File.ext").absolute()
 
+        actual = found_file == Path_obj
 
-def test_FoundFile_eq_IfEqualFoundFileThenReturnEquality():
-    found_file1 = fsutil.FoundFile("/Path/To/File.ext")
-    found_file2 = fsutil.FoundFile("/Path/To/File.ext")
+        assert actual == True
 
-    actual = found_file1 == found_file2
+    @staticmethod
+    def test_eq_IfEqualStrThenReturnEquality():
+        import os
 
-    assert actual == True
+        found_file = fsutil.FoundFile("/Path/To/File.ext")
+        path_str = os.path.abspath("/Path/To/File.ext")
 
+        actual = found_file == path_str
 
-def test_FoundFile_eq_IfEqualFoundFileThenReturnEquality2():
-    found_file1 = fsutil.FoundFile("/Path/To/File.ext")
-    found_file2 = fsutil.FoundFile("/Other/Path/To/File.ext")
+        assert actual == True
 
-    actual = found_file1 == found_file2
+    @staticmethod
+    def test_eq_IfEqualBytesThenReturnEquality():
+        found_file = fsutil.FoundFile("/Path/To/File.ext")
+        path_bytes = bytes(pathlib.Path("/Path/To/File.ext").absolute())
 
-    assert actual == False
+        actual = found_file == path_bytes
 
+        assert actual == True
 
-def test_FoundFile_eq_IfEqualFoundFileThenReturnEquality3():
-    found_file1 = fsutil.FoundFile("/Path/To/File.ext", "/Path/To")
-    found_file2 = fsutil.FoundFile("/Path/To/File.ext", "/Path")
+    @staticmethod
+    def test_eq_IfEqualOthersThenReturnFalse():
+        found_file = fsutil.FoundFile("/Path/To/File.ext")
+        other = object()
 
-    actual = found_file1 == found_file2
+        actual = found_file == other
 
-    assert actual == False
+        assert actual == False
 
+    @staticmethod
+    def test_fspath_Fspath(build_path):
+        import os
 
-def test_FoundFile_eq_IfEqualPathThenReturnEquality():
-    found_file = fsutil.FoundFile("/Path/To/File.ext")
-    Path_obj = pathlib.Path("/Path/To/File.ext").absolute()
+        found_file = fsutil.FoundFile("/Path/To/File.ext")
 
-    actual = found_file == Path_obj
+        actual = os.path.abspath(found_file)
 
-    assert actual == True
-
-
-def test_FoundFile_eq_IfEqualStrThenReturnEquality():
-    import os
-
-    found_file = fsutil.FoundFile("/Path/To/File.ext")
-    path_str = os.path.abspath("/Path/To/File.ext")
-
-    actual = found_file == path_str
-
-    assert actual == True
-
-
-def test_FoundFile_eq_IfEqualBytesThenReturnEquality():
-    found_file = fsutil.FoundFile("/Path/To/File.ext")
-    path_bytes = bytes(pathlib.Path("/Path/To/File.ext").absolute())
-
-    actual = found_file == path_bytes
-
-    assert actual == True
-
-
-def test_FoundFile_eq_IfEqualOthersThenReturnFalse():
-    found_file = fsutil.FoundFile("/Path/To/File.ext")
-    other = object()
-
-    actual = found_file == other
-
-    assert actual == False
-
-
-def test_FoundFile_fspath_Fspath(build_path):
-    import os
-
-    found_file = fsutil.FoundFile("/Path/To/File.ext")
-
-    actual = os.path.abspath(found_file)
-
-    assert actual == os.path.abspath(build_path("/Path/To/", file="File.ext"))
+        assert actual == os.path.abspath(build_path("/Path/To/", file="File.ext"))
