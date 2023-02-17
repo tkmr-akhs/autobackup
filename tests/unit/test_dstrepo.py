@@ -12,12 +12,12 @@ from tests.testutil import testpath
 class Test_DestinationRepository_get_dst_file:
     @staticmethod
     def test_ReturnDestinationFile(
-        testdata, testdata_timestamp, mocker, FoundFileMock, build_path
+        dummy_testdata, testdata_timestamp, mocker, FoundFileMock, build_path
     ):
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata(__name__)
+        target_root, all_files = dummy_testdata
 
         src_testfile11_path = testpath.src_testfile11_path(target_root, norm_path=False)
         src_testfile11 = fsutil.FoundFile(
@@ -32,19 +32,19 @@ class Test_DestinationRepository_get_dst_file:
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
 
         # Act
-        actual = d_repo.get_dst_file(src_testfile11)
+        actual = d_repo.get_dst_file(src_testfile11, all_files)
 
         # Assert
         assert actual == (dst_testfile11, False)
 
     @staticmethod
     def test_ReturnDestinationFile2(
-        testdata, testdata_timestamp, mocker, FoundFileMock, build_path
+        dummy_testdata, testdata_timestamp, mocker, FoundFileMock, build_path
     ):
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata(__name__)
+        target_root, all_files = dummy_testdata
 
         src_testfile11_path = testpath.src_testfile11_path(target_root, norm_path=False)
         src_testfile11 = fsutil.FoundFile(
@@ -61,19 +61,19 @@ class Test_DestinationRepository_get_dst_file:
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
 
         # Act
-        actual = d_repo.get_dst_file(src_testfile11)
+        actual = d_repo.get_dst_file(src_testfile11, all_files)
 
         # Assert
         assert actual == (dst_testfile11, False)
 
     @staticmethod
     def test_IfSameMtimeThenReturnSkip(
-        mocker, testdata_fresh, testdata_timestamp, FoundFileMock, build_path
+        mocker, dummy_testdata_fresh, testdata_timestamp, FoundFileMock, build_path
     ):
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata_fresh(__name__)
+        target_root, all_files = dummy_testdata_fresh
 
         src_testfile11_path = testpath.src_testfile11_path(target_root, norm_path=False)
         src_testfile11 = fsutil.FoundFile(
@@ -88,19 +88,23 @@ class Test_DestinationRepository_get_dst_file:
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
 
         # Act
-        actual = d_repo.get_dst_file(src_testfile11)
+        actual = d_repo.get_dst_file(src_testfile11, all_files)
 
         # Assert
         assert actual == (dst_testfile11, True)
 
     @staticmethod
     def test_IfSameMtimeThenReturnSkip2(
-        mocker, testdata_fresh_noseq, testdata_timestamp, FoundFileMock, build_path
+        mocker,
+        dummy_testdata_fresh_noseq,
+        testdata_timestamp,
+        FoundFileMock,
+        build_path,
     ):
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata_fresh_noseq(__name__)
+        target_root, all_files = dummy_testdata_fresh_noseq
 
         src_testfile11_path = testpath.src_testfile11_path(target_root, norm_path=False)
         src_testfile11 = fsutil.FoundFile(
@@ -117,19 +121,20 @@ class Test_DestinationRepository_get_dst_file:
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
 
         # Act
-        actual = d_repo.get_dst_file(src_testfile11)
-
+        actual = d_repo.get_dst_file(src_testfile11, all_files)
+        test1, test2 = actual
         # Assert
+        assert str(test1) == str(dst_testfile11)
         assert actual == (dst_testfile11, True)
 
     @staticmethod
     def test_IfDifferMtimeThenReturnNotSkip(
-        mocker, testdata_stale, testdata_timestamp, FoundFileMock, build_path
+        mocker, dummy_testdata_stale, testdata_timestamp, FoundFileMock, build_path
     ):
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata_stale(__name__)
+        target_root, all_files = dummy_testdata_stale
 
         src_testfile11_path = testpath.src_testfile11_path(target_root, norm_path=False)
         src_testfile11 = fsutil.FoundFile(
@@ -154,19 +159,23 @@ class Test_DestinationRepository_get_dst_file:
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
 
         # Act
-        actual = d_repo.get_dst_file(src_testfile11)
+        actual = d_repo.get_dst_file(src_testfile11, all_files)
 
         # Assert
         assert actual == (dst_testfile11_new, False)
 
     @staticmethod
     def test_IfDifferMtimeThenReturnNotSkip2(
-        mocker, testdata_stale_noseq, testdata_timestamp, FoundFileMock, build_path
+        mocker,
+        dummy_testdata_stale_noseq,
+        testdata_timestamp,
+        FoundFileMock,
+        build_path,
     ):
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata_stale_noseq(__name__)
+        target_root, all_files = dummy_testdata_stale_noseq
 
         src_testfile11_path = testpath.src_testfile11_path(target_root, norm_path=False)
         src_testfile11 = fsutil.FoundFile(
@@ -183,7 +192,7 @@ class Test_DestinationRepository_get_dst_file:
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
 
         # Act
-        actual = d_repo.get_dst_file(src_testfile11)
+        actual = d_repo.get_dst_file(src_testfile11, all_files)
 
         # Assert
         assert actual == (dst_testfile11, False)
@@ -357,14 +366,19 @@ class Test_DestinationRepository_create_backups:
 class Test_DestinationRepository_get_all_backups:
     @staticmethod
     def test_GetCurrentDstFiles(
-        mocker, testdata_fresh, testdata_timestamp, rscan, FoundFileMock, build_path
+        mocker,
+        dummy_testdata_fresh,
+        testdata_timestamp,
+        rscan,
+        FoundFileMock,
+        build_path,
     ):
         # Arrange
         from os.path import normcase
 
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
-        target_root = testdata_fresh(__name__)
+        target_root, all_files = dummy_testdata_fresh
 
         dst_testfile_basename = build_path(
             target_root,
@@ -443,7 +457,7 @@ class Test_DestinationRepository_get_all_backups:
         )
 
         # Act
-        actual = dict(d_repo.get_all_backups())
+        actual = dict(d_repo.get_all_backups(all_files))
 
         # Assert
         assert set(actual) == set(

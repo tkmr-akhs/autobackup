@@ -192,17 +192,19 @@ class DestinationRepository:
         all_files: dict[str, FoundFile],
     ):
         # Assemble the destination path from each element.
-        dst_file = FoundFile(
-            self._build_dst_filepath(dst_path, file_name, mtime_date, None, file_ext),
-            str(src_file.scan_root_path),
+        dst_filepath = self._build_dst_filepath(
+            dst_path, file_name, mtime_date, None, file_ext
         )
 
         is_skip = False
 
-        if self._is_exist_file(dst_file, all_files):
+        if self._is_exist_file(dst_filepath, all_files):
+            dst_file = self._build_dst_file(src_file, dst_filepath, all_files)
             if dst_file.mtime == src_file.mtime:
                 # Ignore if a backup has already been taken.
                 is_skip = True
+        else:
+            dst_file = FoundFile(dst_filepath, src_file.scan_root_path)
 
         return (dst_file, is_skip)
 

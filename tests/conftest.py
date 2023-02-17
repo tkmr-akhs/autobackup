@@ -58,7 +58,7 @@ def dummy_testdata_fresh_noseq():
 
 
 @pytest.fixture
-def dummy_testdata_satle():
+def dummy_testdata_stale():
     result = _create_src_dummy_files()
     result.update(_create_dst_dummy_files(testutil.TESTDATA_TIMESTAMP - 0.001))
     return (DUMMY_SCAN_ROOT, result)
@@ -68,7 +68,7 @@ def dummy_testdata_satle():
 def dummy_testdata_stale_noseq():
     result = _create_src_dummy_files()
     result.update(_create_dst_dummy_files_noseq(testutil.TESTDATA_TIMESTAMP - 0.001))
-    return _create_src_dummy_files(DUMMY_SCAN_ROOT, result)
+    return (DUMMY_SCAN_ROOT, result)
 
 
 @pytest.fixture
@@ -289,53 +289,58 @@ def _create_dst_dummy_files(mtime: float) -> dict[str, FoundFile]:
 def _create_dst_dummy_files_noseq(mtime: float) -> dict[str, FoundFile]:
     from tests.testutil import TESTDATA_TIMESTAMP, build_path, dummyfile
 
-    mtime_str = datetime(mtime).strftime("_%Y-%m-%d")
+    mtime_str = datetime.fromtimestamp(mtime).strftime("_%Y-%m-%d")
     target_dir = DUMMY_SCAN_ROOT
     dst_testfile_key = build_path(target_dir, ".old", file=f"testfile{mtime_str}")
     dst_testfile = dummyfile.get_file(
         target_dir,
+        ".old",
         file_prefix="TestFile",
         strftime="_%Y-%m-%d",
         mtime=mtime,
     )
     dst_testfile11_key = build_path(
-        target_dir, ".old", "testdir1", file=f"testfile11{mtime_str}"
+        target_dir, "testdir1", ".old", file=f"testfile11{mtime_str}"
     )
     dst_testfile11 = dummyfile.get_file(
         target_dir,
         "TestDir1",
+        ".old",
         file_prefix="TestFile11",
         strftime="_%Y-%m-%d",
         mtime=mtime,
     )
     dst_testfile12_key = build_path(
-        target_dir, ".old", "testdir1", file=f"testfile12{mtime_str}.ext"
+        target_dir, "testdir1", ".old", file=f"testfile12{mtime_str}.ext"
     )
     dst_testfile12 = dummyfile.get_file(
         target_dir,
         "TestDir1",
+        ".old",
         file_prefix="TestFile12",
         file_suffix=".ext",
         strftime="_%Y-%m-%d",
         mtime=mtime,
     )
     dst_testfile21_key = build_path(
-        target_dir, ".old", "testdir2", file=f".testfile21{mtime_str}"
+        target_dir, "testdir2", ".old", file=f".testfile21{mtime_str}"
     )
     dst_testfile21 = dummyfile.get_file(
         target_dir,
         "TestDir2",
+        ".old",
         file_prefix=".TestFile21",
         strftime="_%Y-%m-%d",
         mtime=mtime,
         is_hidden_flag=True,
     )
     dst_testfile22_key = build_path(
-        target_dir, ".old", "testdir2", file=f"testfile22{mtime_str}"
+        target_dir, "testdir2", ".old", file=f"testfile22{mtime_str}"
     )
     dst_testfile22 = dummyfile.get_file(
         target_dir,
         "TestDir2",
+        ".old",
         file_prefix="TestFile22",
         strftime="_%Y-%m-%d",
         mtime=mtime,
