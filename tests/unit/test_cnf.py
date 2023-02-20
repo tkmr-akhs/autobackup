@@ -17,7 +17,7 @@ class Test_validate_app_cnf:
         cnf.validate_app_cnf(app_cnf)
 
     @staticmethod
-    def test_IfDstDirpathIsEmptyStrThenRaiseNoException():
+    def test_IfDstDirpathIsEmptyStrThenRaiseException():
         # Arrange
         app_cnf = {
             "common": {"destination_dir": "", "tmp_dirpath": "a", "var_dirpath": "a"}
@@ -31,7 +31,7 @@ class Test_validate_app_cnf:
         assert not cnf_error is None
 
     @staticmethod
-    def test_IfTmpDirpathIsEmptyStrThenRaiseNoException():
+    def test_IfTmpDirpathIsEmptyStrThenRaiseException():
         # Arrange
         app_cnf = {
             "common": {"destination_dir": "a", "tmp_dirpath": "", "var_dirpath": "a"}
@@ -45,7 +45,7 @@ class Test_validate_app_cnf:
         assert not cnf_error is None
 
     @staticmethod
-    def test_IfVarDirpathIsEmptyStrThenRaiseNoException():
+    def test_IfVarDirpathIsEmptyStrThenRaiseException():
         # Arrange
         app_cnf = {
             "common": {"destination_dir": "a", "tmp_dirpath": "a", "var_dirpath": ""}
@@ -59,7 +59,7 @@ class Test_validate_app_cnf:
         assert not cnf_error is None
 
     @staticmethod
-    def test_IfDistinationDirNameIsAbsolutePathThenRaiseNoException():
+    def test_IfDistinationDirNameIsAbsolutePathThenRaiseException():
         # Arrange
         app_cnf = {
             "common": {"destination_dir": "/a", "tmp_dirpath": "a", "var_dirpath": "a"}

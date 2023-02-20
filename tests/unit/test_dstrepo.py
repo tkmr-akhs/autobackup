@@ -38,7 +38,7 @@ class Test_DestinationRepository_get_dst_file:
         assert actual == (dst_testfile11, False)
 
     @staticmethod
-    def test_ReturnDestinationFile2(
+    def test_ReturnDestinationFileNoSep(
         dummy_testdata, testdata_timestamp, mocker, FoundFileMock, build_path
     ):
         # Arrange
@@ -94,7 +94,7 @@ class Test_DestinationRepository_get_dst_file:
         assert actual == (dst_testfile11, True)
 
     @staticmethod
-    def test_IfSameMtimeThenReturnSkip2(
+    def test_IfSameMtimeThenReturnSkipNoSep(
         mocker,
         dummy_testdata_fresh_noseq,
         testdata_timestamp,
@@ -165,7 +165,7 @@ class Test_DestinationRepository_get_dst_file:
         assert actual == (dst_testfile11_new, False)
 
     @staticmethod
-    def test_IfDifferMtimeThenReturnNotSkip2(
+    def test_IfDifferMtimeThenReturnNotSkipNoSep(
         mocker,
         dummy_testdata_stale_noseq,
         testdata_timestamp,
