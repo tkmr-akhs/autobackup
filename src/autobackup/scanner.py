@@ -24,6 +24,8 @@ class AllFileScanner:
             dict[str, fsutil.FoundFile]: Files that is found
         """
         result = {}
+        prev_total = 0
+        current_total = -1
         r_scanner = fsutil.RecursiveScanDir()
         for target_path in self._target_dirs:
             found_files = r_scanner.recursive_scandir(
@@ -31,8 +33,11 @@ class AllFileScanner:
             )
             for file in found_files:
                 result[file.normpath_str] = file
-            self._logger.info("SCAN_DIR: %s", target_path)
 
-        self._logger.info("SCANNED_FILE_COUNT: %i", len(result))
+            current_total = len(result)
+            self._logger.info(
+                "SCAN_DIR: (%i files) %s", current_total - prev_total, target_path
+            )
+            prev_total = current_total
 
         return result

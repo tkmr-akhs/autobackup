@@ -13,7 +13,6 @@ def test_main_CreateBackup(testdir, testdata, testdata_timestamp, rscan):
     expected_logs = [
         "START: autobackup",
         "SCAN_DIR: ",
-        "SCANNED_FILE_COUNT: ",
         "COPY_FILE_TO_",
         "COPY_FILE_TO_",
         "COPY_FILE_TO_",
@@ -22,7 +21,6 @@ def test_main_CreateBackup(testdir, testdata, testdata_timestamp, rscan):
         "FINISH: autobackup",
         "START: autobackup",
         "SCAN_DIR: ",
-        "SCANNED_FILE_COUNT: ",
         "COPY_FILE_TO_",
         "FINISH: autobackup",
     ]
@@ -108,7 +106,6 @@ def test_main_IfAlreadyBackedUpThenSkipBackup(
     expected_logs = [
         "START: autobackup",
         "SCAN_DIR: ",
-        "SCANNED_FILE_COUNT: ",
         "FINISH: autobackup",
     ]
     test_dir = testdir(__name__)
