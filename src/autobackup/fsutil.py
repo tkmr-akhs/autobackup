@@ -33,8 +33,7 @@ class RecursiveScanDir:
             found.append(item_hash)
 
             if item.is_dir():
-                # generator function
-                if not (not scan_symlink_dir and item.is_symlink()):
+                if scan_symlink_dir or not item.is_symlink():
                     yield from self._recursive_scandir(
                         item.path, scan_root, scan_symlink_dir, found
                     )

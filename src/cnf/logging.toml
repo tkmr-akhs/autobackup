@@ -8,6 +8,10 @@ handlers = ["fileHandler", "stderrHandler"]
 level = "NOTSET"
 handlers = ["fileHandler", "stderrHandler"]
 
+[loggers.scanner]
+level = "NOTSET"
+handlers = ["fileHandler", "stderrHandler"]
+
 [loggers.srcrepo]
 level = "NOTSET"
 handlers = ["fileHandler", "stderrHandler"]

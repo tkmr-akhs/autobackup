@@ -1,5 +1,5 @@
 """Module for AllFileScanner"""
-from typing import Any
+from logging import getLogger
 
 from . import fsutil
 
@@ -13,6 +13,7 @@ class AllFileScanner:
         Args:
             targets (list[dict[str, Any]]): Scan target directories
         """
+        self._logger = getLogger(__name__)
         self._target_dirs = target_dirs
         self._scan_symlink_dir = scan_symlink_dir
 
@@ -30,5 +31,8 @@ class AllFileScanner:
             )
             for file in found_files:
                 result[file.normpath_str] = file
+            self._logger.info("SCAN_DIR: %s", target_path)
+
+        self._logger.info("SCANNED_FILE_COUNT: %i", len(result))
 
         return result

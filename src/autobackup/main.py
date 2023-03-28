@@ -2,6 +2,7 @@
 import logging.config
 import os
 import sqlite3
+import sys
 import time
 from contextlib import closing
 from logging import FileHandler, Logger, error, getLogger
@@ -60,50 +61,59 @@ class Main:
         Returns:
             int: Exit code of command
         """
-        exit_code = 0
+        exit_code = -1
 
-        # Preparing the BackupRepositories
-        b_factory = BackupRepositoryFactory(
-            self._app_cnf["targets"],
-            self._app_cnf["common"]["destination_dir"],
-            self._app_cnf["common"]["datetime_format"],
-            self._seq_num_sep,
-            self._app_cnf["common"]["scan_symlink_dir"],
-        )
-        s_repo = b_factory.get_source_repository()
-        d_repo = b_factory.get_destination_repository()
-        scnr = b_factory.get_all_file_scanner()
+        try:
+            self._logger.info("START: autobackup")
+            # Preparing the BackupRepositories
+            b_factory = BackupRepositoryFactory(
+                self._app_cnf["targets"],
+                self._app_cnf["common"]["destination_dir"],
+                self._app_cnf["common"]["datetime_format"],
+                self._seq_num_sep,
+                self._app_cnf["common"]["scan_symlink_dir"],
+            )
+            s_repo = b_factory.get_source_repository()
+            d_repo = b_factory.get_destination_repository()
+            scnr = b_factory.get_all_file_scanner()
 
-        with closing(
-            sqlite3.connect(
-                os.path.join(
-                    self._app_cnf["common"]["var_dirpath"],
-                    self._app_cnf["common"]["db_filename"],
+            with closing(
+                sqlite3.connect(
+                    os.path.join(
+                        self._app_cnf["common"]["var_dirpath"],
+                        self._app_cnf["common"]["db_filename"],
+                    )
                 )
-            )
-        ) as dbconn:
-            # Preparing the MetadatapRepository
-            m_factory = MetadataRepositoryFactory(dbconn)
-            m_repo = m_factory.get_metadata_repository()
+            ) as dbconn:
+                # Preparing the MetadatapRepository
+                m_factory = MetadataRepositoryFactory(dbconn)
+                m_repo = m_factory.get_metadata_repository()
 
-            # Preparing the BackupFacade
-            b_facade = BackupFacade(s_repo, d_repo, m_repo, scnr)
+                # Preparing the BackupFacade
+                b_facade = BackupFacade(s_repo, d_repo, m_repo, scnr)
 
-            # Execute
-            b_facade.execute(
-                self._app_cnf["common"]["discard_old_backup"],
-                self._app_cnf["common"]["discard_phase1_weeks"],
-                self._app_cnf["common"]["discard_phase2_months"],
-            )
+                # Execute
+                b_facade.execute(
+                    self._app_cnf["common"]["discard_old_backup"],
+                    self._app_cnf["common"]["discard_phase1_weeks"],
+                    self._app_cnf["common"]["discard_phase2_months"],
+                )
 
-        self._logger.info("FINISH: autobackup")
+            self._logger.info("FINISH: autobackup")
 
-        # for name in Logger.manager.loggerDict.keys():
-        #     logger = getLogger(name)
-        #     for handler in logger.handlers:
-        #         if isinstance(handler, FileHandler):
-        #             logger.removeHandler(handler)
-        #             handler.close()
-        # time.sleep(5)
+            # for name in Logger.manager.loggerDict.keys():
+            #     logger = getLogger(name)
+            #     for handler in logger.handlers:
+            #         if isinstance(handler, FileHandler):
+            #             logger.removeHandler(handler)
+            #             handler.close()
+            # time.sleep(5)
 
-        return exit_code
+            exit_code = 0
+        except OSError as os_err:
+            self._logger.error("FINISH_WITH_ERROR: %s: %s", type(os_err), os_err)
+            exit_code = os_err.winerror if sys.platform == "win32" else os_err.errno
+        except BaseException as exc:
+            self._logger.error("FINISH_WITH_ERROR: %s: %s", type(exc), exc)
+        finally:
+            return exit_code

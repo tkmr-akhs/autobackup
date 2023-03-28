@@ -11,6 +11,9 @@ from autobackup import main
 def test_main_CreateBackup(testdir, testdata, testdata_timestamp, rscan):
     # Arrange
     expected_logs = [
+        "START: autobackup",
+        "SCAN_DIR: ",
+        "SCANNED_FILE_COUNT: ",
         "COPY_FILE_TO_",
         "REPLACE_INTO_DB: ",
         "COPY_FILE_TO_",
@@ -22,6 +25,9 @@ def test_main_CreateBackup(testdir, testdata, testdata_timestamp, rscan):
         "COPY_FILE_TO_",
         "REPLACE_INTO_DB: ",
         "FINISH: autobackup",
+        "START: autobackup",
+        "SCAN_DIR: ",
+        "SCANNED_FILE_COUNT: ",
         "COPY_FILE_TO_",
         "REPLACE_INTO_DB: ",
         "FINISH: autobackup",
@@ -106,6 +112,9 @@ def test_main_IfAlreadyBackedUpThenSkipBackup(
 ):
     # Arrange
     expected_logs = [
+        "START: autobackup",
+        "SCAN_DIR: ",
+        "SCANNED_FILE_COUNT: ",
         "SKIP(Already):",
         "REPLACE_INTO_DB:",
         "SKIP(Already):",
