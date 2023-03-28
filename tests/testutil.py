@@ -32,14 +32,20 @@ class FoundFileMock(FoundFile):
         scan_root_dirpath: str = None,
         mtime: float = 0.0,
         is_hidden_flag: bool = False,
+        size: int = 4096,
     ) -> None:
         super().__init__(filepath, scan_root_dirpath)
         self._mtime = mtime
+        self._size = size
         self._is_hidden_flag = is_hidden_flag
 
     @property
     def mtime(self) -> float:
         return self._mtime
+
+    @property
+    def size(self) -> int:
+        return self._size
 
     def is_hidden(self) -> bool:
         import platform

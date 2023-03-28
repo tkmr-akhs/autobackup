@@ -89,6 +89,11 @@ class FoundFile(os.PathLike):
         return os.path.normpath(os.path.normcase(str(self)))
 
     @property
+    def size(self) -> int:
+        """st_size of file"""
+        return self.path.stat().st_size
+
+    @property
     def mtime(self) -> float:
         """st_mtime of file"""
         return self.path.stat().st_mtime

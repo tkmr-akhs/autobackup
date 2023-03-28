@@ -67,10 +67,15 @@ class BackupFacade:
         # Create backups and Update Metadata
         modified_files = self._get_modified_files(src_files)
         processed_files = self._d_repo.create_backups(modified_files)
+
+        total_size = 0
         for src_file, dst_file in processed_files:
+            total_size += src_file.size
             self._m_repo.update_metadata(
                 metarepo.Metadata(src_file.normpath_str, src_file.mtime)
             )
+
+        self._logger.info("TOTAL_SIZE: %i", total_size)
 
         # Discard old backups
         if discard_old_backups:

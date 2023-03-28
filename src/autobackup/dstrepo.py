@@ -284,7 +284,12 @@ class DestinationRepository:
                 self._logger.warning("ERROR: %s", str(os_error))
                 return None
             else:
-                self._logger.info("COPY_FILE_TO_[%s]: %s", self._dst_dir_name, src_file)
+                self._logger.info(
+                    "COPY_FILE_TO_[%s]: (%i bytes) %s",
+                    self._dst_dir_name,
+                    src_file.size,
+                    src_file,
+                )
                 return (src_file, dst_file)
 
     def create_backups(
