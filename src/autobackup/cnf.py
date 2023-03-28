@@ -151,6 +151,11 @@ def get_cli_cnf(args: list[str]) -> dict[str, Any]:
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--dry_run",
+        action="store_true",
+        help="Perform a dry run to preview changes without actually executing them.",
+    )
+    parser.add_argument(
         "--cnf_dirpath", help="Directory containing configuration files."
     )
     parser.add_argument("--tmp_dirpath", help="Directory to store temporary files.")

@@ -42,7 +42,7 @@ class Test_BackupFacade_get_files_to_be_discarded:
     def test_IfFileInfoIsEmptyThenReturnEmptyList():
         # Arrange
         today = datetime.date(2023, 1, 22)
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
         all_files = {}
 
         fcd = bkup.BackupFacade(None, d_repo, None, None)
@@ -63,7 +63,7 @@ class Test_BackupFacade_get_files_to_be_discarded:
         path0 = "path_to_dir" + sep + "file_2000-01-01_0000.txt"
         path0_mtime = datetime.datetime(2000, 1, 1, 1, 0, 0, 0).timestamp()
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         all_files = {path0: fsutil.FoundFile(path0, None, path0_mtime)}
 
@@ -84,7 +84,7 @@ class Test_BackupFacade_get_files_to_be_discarded:
         # Arrange
         # mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
         today, all_files, expected = test_prarams_for_get_discard_list
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
         fcd = bkup.BackupFacade(None, d_repo, None, None)
 
         # Act
@@ -102,7 +102,7 @@ class Test_BackupFacade_get_files_to_be_discarded:
         # Arrange
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
         today = datetime.date(2023, 1, 22)
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None, False)
         path0 = build_path("path_to_dir", ".old", file="File_2022-12-31.txt")
         path1 = build_path("path_to_dir", ".old", file="File_2023-01-01.txt")
         path0_mtime = datetime.datetime(2023, 1, 1, 0, 0, 0, 0).timestamp()
@@ -418,7 +418,7 @@ class Test_BackupFacade_execute:
                 ],
                 None,
             ),
-            dstrepo.DestinationRepository(None, "", "", ""),
+            dstrepo.DestinationRepository(None, "", "", "", False),
             metarepo.MetadataRepository(sqlite3.connect(":memory:")),
             scnr,
         )

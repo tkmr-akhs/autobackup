@@ -86,6 +86,7 @@ class DestinationRepository:
         dst_dir_name: str,
         datetime_format: str,
         seq_sep: str,
+        dry_run: bool,
     ):
         """Initializer
 
@@ -102,6 +103,7 @@ class DestinationRepository:
         self._dst_dir_name = dst_dir_name
         self._datetime_format = datetime_format
         self._seq_sep = seq_sep
+        self._dry_run = dry_run
         self._check_filepath_re = self._get_check_filepath_re()
         self._logger = getLogger(__name__)
 
@@ -274,9 +276,10 @@ class DestinationRepository:
             return (src_file, dst_file)
         else:
             try:
-                if not dst_dir.exists():
-                    dst_dir.mkdir()
-                shutil.copy2(str(src_file), str(dst_file))
+                if not self._dry_run:
+                    if not dst_dir.exists():
+                        dst_dir.mkdir()
+                    shutil.copy2(str(src_file), str(dst_file))
             except OSError as os_error:
                 self._logger.warning("ERROR: %s", str(os_error))
                 return None
@@ -338,7 +341,8 @@ class DestinationRepository:
 
         """
         try:
-            os.remove(str(file))
+            if not self._dry_run:
+                os.remove(str(file))
         except OSError as os_error:
             self._logger.warning("ERROR: %s", str(os_error))
             return None

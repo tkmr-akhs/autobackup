@@ -64,7 +64,10 @@ class Main:
         exit_code = -1
 
         try:
-            self._logger.info("START: autobackup")
+            self._logger.info(
+                "START: autobackup%s",
+                (" (dry-run)" if self._app_cnf["common"]["dry_run"] else ""),
+            )
             # Preparing the BackupRepositories
             b_factory = BackupRepositoryFactory(
                 self._app_cnf["targets"],
@@ -72,6 +75,7 @@ class Main:
                 self._app_cnf["common"]["datetime_format"],
                 self._seq_num_sep,
                 self._app_cnf["common"]["scan_symlink_dir"],
+                self._app_cnf["common"]["dry_run"],
             )
             s_repo = b_factory.get_source_repository()
             d_repo = b_factory.get_destination_repository()
@@ -99,7 +103,10 @@ class Main:
                     self._app_cnf["common"]["discard_phase2_months"],
                 )
 
-            self._logger.info("FINISH: autobackup")
+            self._logger.info(
+                "FINISH: autobackup%s",
+                (" (dry-run)" if self._app_cnf["common"]["dry_run"] else ""),
+            )
 
             # for name in Logger.manager.loggerDict.keys():
             #     logger = getLogger(name)

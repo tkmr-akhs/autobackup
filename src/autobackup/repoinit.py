@@ -38,6 +38,7 @@ class BackupRepositoryFactory:
         datetime_format: str,
         seq_num_sep: str = "_",
         scan_symlink_dir: bool = False,
+        dry_run: bool = False,
     ) -> None:
         """Initializer
 
@@ -55,6 +56,8 @@ class BackupRepositoryFactory:
         self._dst_dir_name = dst_dir_name
         self._datetime_format = datetime_format
         self._seq_num_sep = seq_num_sep
+        self._dry_run = dry_run
+
         self._scanner = AllFileScanner(
             [target["path"] for target in targets], scan_symlink_dir
         )
@@ -78,6 +81,7 @@ class BackupRepositoryFactory:
             self._dst_dir_name,
             self._datetime_format,
             self._seq_num_sep,
+            self._dry_run,
         )
 
     def get_all_file_scanner(self) -> AllFileScanner:

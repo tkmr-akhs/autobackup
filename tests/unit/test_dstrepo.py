@@ -29,7 +29,7 @@ class Test_DestinationRepository_get_dst_file:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual = d_repo.get_dst_file(src_testfile11, all_files)
@@ -58,7 +58,7 @@ class Test_DestinationRepository_get_dst_file:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None, False)
 
         # Act
         actual = d_repo.get_dst_file(src_testfile11, all_files)
@@ -85,7 +85,7 @@ class Test_DestinationRepository_get_dst_file:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual = d_repo.get_dst_file(src_testfile11, all_files)
@@ -118,7 +118,7 @@ class Test_DestinationRepository_get_dst_file:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None, False)
 
         # Act
         actual = d_repo.get_dst_file(src_testfile11, all_files)
@@ -156,7 +156,7 @@ class Test_DestinationRepository_get_dst_file:
             dst_testfile11_new_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual = d_repo.get_dst_file(src_testfile11, all_files)
@@ -189,7 +189,7 @@ class Test_DestinationRepository_get_dst_file:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None)
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", None, False)
 
         # Act
         actual = d_repo.get_dst_file(src_testfile11, all_files)
@@ -220,7 +220,7 @@ class Test_DestinationRepository_create_backup:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual1 = d_repo.create_backup(src_testfile11)
@@ -275,7 +275,7 @@ class Test_DestinationRepository_create_backup:
             dst_testfile11_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual1 = d_repo.create_backup(src_testfile11)
@@ -329,7 +329,7 @@ class Test_DestinationRepository_create_backups:
             dst_testfile12_path, target_root, testdata_timestamp
         )
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual1 = [
@@ -454,6 +454,7 @@ class Test_DestinationRepository_get_all_backups:
             ".old",
             "_%Y-%m-%d",
             "_",
+            False,
         )
 
         # Act
@@ -513,7 +514,7 @@ class Test_DestinationRepository_remove_backups:
 
         remove_list = [dst_testfile12, dst_testfile21]
 
-        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
+        d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_", False)
 
         # Act
         actual1 = [item for item in d_repo.remove_backups(remove_list)]

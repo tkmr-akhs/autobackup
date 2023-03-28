@@ -179,6 +179,7 @@ class Test_get_cli_cnf:
         ]
         expected = {
             "common": {
+                "dry_run": False,
                 "cnf_dirpath": "path/to/dir1",
                 "tmp_dirpath": "path/to/dir2",
                 "var_dirpath": "path/to/dir3",
@@ -223,6 +224,7 @@ class Test_get_cli_cnf:
         args = ["progname"]
         expected = {
             "common": {
+                "dry_run": False,
                 "cnf_dirpath": None,
                 "tmp_dirpath": None,
                 "var_dirpath": None,
