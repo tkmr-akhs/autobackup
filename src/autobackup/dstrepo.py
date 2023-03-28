@@ -270,7 +270,7 @@ class DestinationRepository:
         dst_file, is_skip = self.get_dst_file(src_file)
         dst_dir = dst_file.parent
         if is_skip:
-            self._logger.info("SKIP(Already): %s", src_file)
+            self._logger.debug("SKIP(Already): %s", src_file)
             return (src_file, dst_file)
         else:
             try:

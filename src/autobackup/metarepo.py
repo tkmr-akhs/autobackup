@@ -96,7 +96,7 @@ class MetadataRepository:
         cur.execute(
             f"DELETE FROM {_TABLE_NAME} WHERE {_PATH_COL_NAME} = {_esc_sp_ch(key)}"
         )
-        self._logger.info("DELETE_FROM_DB: %s", key)
+        self._logger.debug("DELETE_FROM_DB: %s", key)
         cur.close()
         if do_commit:
             self._dbconn.commit()
@@ -142,7 +142,7 @@ class MetadataRepository:
         cur.execute(
             f"REPLACE INTO {_TABLE_NAME}({_PATH_COL_NAME},{_MTIME_COL_NAME}) VALUES({_esc_sp_ch(mdata.key)},{str(mdata.mtime)})"
         )
-        self._logger.info("REPLACE_INTO_DB: %s", mdata.key)
+        self._logger.debug("REPLACE_INTO_DB: %s", mdata.key)
 
         cur.close()
         if do_commit:

@@ -80,8 +80,8 @@ class Test_MetadataRepository_remove_metadatas:
         # Arrange
         caplog.set_level(DEBUG)
         expected_logs = [
-            ("autobackup.metarepo", INFO, "DELETE_FROM_DB: "),
-            ("autobackup.metarepo", INFO, "DELETE_FROM_DB: "),
+            ("autobackup.metarepo", DEBUG, "DELETE_FROM_DB: "),
+            ("autobackup.metarepo", DEBUG, "DELETE_FROM_DB: "),
         ]
         dbconn = sqlite3.connect(":memory:")
         fidb = metarepo.MetadataRepository(dbconn)
@@ -142,7 +142,7 @@ class Test_MetadataRepository_update_metadata:
         # Arrange
         caplog.set_level(DEBUG)
         expected_logs = [
-            ("autobackup.metarepo", INFO, "REPLACE_INTO_DB: "),
+            ("autobackup.metarepo", DEBUG, "REPLACE_INTO_DB: "),
         ]
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
         dbconn = sqlite3.connect(":memory:")

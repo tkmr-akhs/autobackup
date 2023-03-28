@@ -260,7 +260,7 @@ class Test_DestinationRepository_create_backup:
     ):
         # Arrange
         caplog.set_level(DEBUG)
-        expected_logs = [("autobackup.dstrepo", INFO, "SKIP(Already): ")]
+        expected_logs = [("autobackup.dstrepo", DEBUG, "SKIP(Already): ")]
         mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
 
         target_root = testdata_fresh(__name__)
