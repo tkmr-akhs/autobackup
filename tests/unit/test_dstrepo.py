@@ -489,7 +489,13 @@ class Test_DestinationRepository_get_all_backups:
 class Test_DestinationRepository_remove_backups:
     @staticmethod
     def test_RemoveDstFiles(
-        caplog, testdata_fresh, testdata_timestamp, rscan, build_path
+        mocker,
+        caplog,
+        testdata_fresh,
+        testdata_timestamp,
+        rscan,
+        FoundFileMock,
+        build_path,
     ):
         # Arrange
         caplog.set_level(DEBUG)
@@ -497,12 +503,15 @@ class Test_DestinationRepository_remove_backups:
             ("autobackup.dstrepo", WARNING, "DELETE_FILE: "),
             ("autobackup.dstrepo", WARNING, "DELETE_FILE: "),
         ]
+        mocker.patch("autobackup.fsutil.FoundFile", new=FoundFileMock)
         target_root = testdata_fresh(__name__)
 
         dst_testfile12_path = testpath.dst_testfile12_path(target_root)
         dst_testfile21_path = testpath.dst_testfile21_path(target_root)
+        dst_testfile12 = fsutil.FoundFile(dst_testfile12_path)
+        dst_testfile21 = fsutil.FoundFile(dst_testfile21_path)
 
-        remove_list = [dst_testfile12_path, dst_testfile21_path]
+        remove_list = [dst_testfile12, dst_testfile21]
 
         d_repo = dstrepo.DestinationRepository(None, ".old", "_%Y-%m-%d", "_")
 

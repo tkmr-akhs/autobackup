@@ -343,7 +343,11 @@ class DestinationRepository:
             self._logger.warning("ERROR: %s", str(os_error))
             return None
         else:
-            self._logger.warning("DELETE_FILE: %s", str(file))
+            self._logger.warning(
+                "DELETE_FILE: %s: %s",
+                datetime.datetime.fromtimestamp(file.mtime).strftime("%Y-%m-%d %T.%f"),
+                str(file),
+            )
             return file
 
     def remove_backups(self, files: list[FoundFile]) -> Generator[FoundFile]:
