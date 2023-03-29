@@ -1,5 +1,6 @@
 """Module for backup destination repository"""
 import datetime
+import math
 import os
 import pathlib
 import re
@@ -285,9 +286,9 @@ class DestinationRepository:
                 return None
             else:
                 self._logger.info(
-                    "COPY_FILE_TO_[%s]: (%i bytes) %s",
+                    "COPY_FILE_TO_[%s]: (%i MB) %s",
                     self._dst_dir_name,
-                    src_file.size,
+                    math.ceil(src_file.size / 1024.0 / 1024.0),
                     src_file,
                 )
                 return (src_file, dst_file)

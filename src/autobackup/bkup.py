@@ -75,7 +75,7 @@ class BackupFacade:
                 metarepo.Metadata(src_file.normpath_str, src_file.mtime)
             )
 
-        self._logger.info("TOTAL_SIZE: %i", total_size)
+        self._logger.info("TOTAL_SIZE: %i MB", math.ceil(total_size / 1024.0 / 1024.0))
 
         # Discard old backups
         if discard_old_backups:
