@@ -394,6 +394,7 @@ class Test_BackupFacade_execute:
         scnr = scanner.AllFileScanner(
             None,
             False,
+            ".old",
             {
                 "0": fsutil.FoundFile("0"),
                 "1": fsutil.FoundFile("1"),

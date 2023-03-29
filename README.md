@@ -39,6 +39,7 @@ catch_regex = '.*\.txt'
 ignore_regex = ''
 catch_hidden = false
 catch_link = false
+recursive = true
 
 [[targets]]
 path = 'C:\TargetDir2'
@@ -46,4 +47,5 @@ catch_regex = '.*\.html'
 ignore_regex = ''
 catch_hidden = false
 catch_link = false
+recursive = true
 ``` 

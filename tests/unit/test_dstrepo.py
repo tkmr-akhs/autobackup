@@ -450,7 +450,7 @@ class Test_DestinationRepository_get_all_backups:
         )
 
         d_repo = dstrepo.DestinationRepository(
-            scanner.AllFileScanner([target_root], False),
+            scanner.AllFileScanner({target_root: True}, False, ".old"),
             ".old",
             "_%Y-%m-%d",
             "_",

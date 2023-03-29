@@ -288,7 +288,14 @@ class Test_ConfigurationLoader_get_app_cnf:
             ]
         )
         assert set(actual["targets"][0].keys()) == set(
-            ["ignore_regex", "path", "catch_hidden", "catch_link", "catch_regex"]
+            [
+                "ignore_regex",
+                "path",
+                "catch_hidden",
+                "catch_link",
+                "catch_regex",
+                "recursive",
+            ]
         )
 
     @staticmethod
@@ -316,5 +323,12 @@ class Test_ConfigurationLoader_get_app_cnf:
             ]
         )
         assert set(actual["targets"][0].keys()) == set(
-            ["ignore_regex", "path", "catch_hidden", "catch_link", "catch_regex"]
+            [
+                "ignore_regex",
+                "path",
+                "catch_hidden",
+                "catch_link",
+                "catch_regex",
+                "recursive",
+            ]
         )

@@ -55,6 +55,30 @@ class RecursiveScanDir:
         """
         yield from self._recursive_scandir(dirpath, dirpath, scan_symlink_dir, [])
 
+    def scandir(
+        self, dirpath: str = ".", dst_dir_name: str = None
+    ) -> Generator["FoundFile"]:
+        """Scan directory.
+
+        In addition, the destination directory of the backup is also scanned.
+
+        Args:
+            dirpath (str, optional): Directory to scan. Defaults to ".".
+            dst_dir_name (str, optional): Sub-directory to scan. Defaults to None.
+
+        Yields:
+            FoundFile: FoundFile object pointing to the path of file.
+        """
+
+        for item in os.scandir(dirpath):
+            if not item.is_dir():
+                yield FoundFile(item.path, dirpath)
+
+        if dst_dir_name:
+            for item in os.scandir(os.path.join(dirpath, dst_dir_name)):
+                if not item.is_dir():
+                    yield FoundFile(item.path, dirpath)
+
 
 class FoundFile(os.PathLike):
     """Class of file which scanned with recursice_scandir() method"""

@@ -4,3 +4,4 @@ catch_regex = '.*'
 ignore_regex = ''
 catch_hidden = true
 catch_link = false
+recursive = true

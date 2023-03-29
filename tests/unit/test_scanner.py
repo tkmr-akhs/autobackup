@@ -13,12 +13,12 @@ class Test_AllFileScanner_get_all_files:
         # Arrange
         target_root = testdata_fresh(__name__)
 
-        targets = [
-            testpath.src_testdir1_path(target_root, norm_path=False),
-            testpath.src_testdir2_path(target_root, norm_path=False),
-        ]
+        targets = {
+            testpath.src_testdir1_path(target_root, norm_path=False): True,
+            testpath.src_testdir2_path(target_root, norm_path=False): True,
+        }
 
-        scnr = scanner.AllFileScanner(targets, False)
+        scnr = scanner.AllFileScanner(targets, False, None)
 
         # Act
         actual = [str(file.relpath) for key, file in scnr.get_all_files().items()]
@@ -34,5 +34,27 @@ class Test_AllFileScanner_get_all_files:
                 ".old" + sep + ".TestFile21_2023-01-23_0000",
                 "TestFile22",
                 ".old" + sep + "TestFile22_2023-01-23_0000",
+            ]
+        )
+
+    @staticmethod
+    def test_IfRecursiveIsFalseThenGetAllFilesTargetDirOnly(testdata_fresh):
+        # Arrange
+        target_root = testdata_fresh(__name__)
+
+        targets = {
+            testpath.src_testdir_path(target_root, norm_path=False): False,
+        }
+
+        scnr = scanner.AllFileScanner(targets, False, ".old")
+
+        # Act
+        actual = [str(file.relpath) for key, file in scnr.get_all_files().items()]
+
+        # Assert
+        assert set(actual) == set(
+            [
+                "TestFile",
+                ".old" + sep + "TestFile_2023-01-23_0000",
             ]
         )

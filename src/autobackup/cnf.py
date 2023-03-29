@@ -181,7 +181,7 @@ def get_cli_cnf(args: list[str]) -> dict[str, Any]:
         "--target",
         action="append",
         help="Specify the target directory and matching criteria in JSON. <Example>: "
-        '{"path": "path/to/dir", "catch_regex": ".*", "ignore_regex": "", "catch_hidden": true, "catch_link": false}',
+        '{"path": "path/to/dir", "catch_regex": ".*", "ignore_regex": "", "catch_hidden": true, "catch_link": false, "recursive": true}',
     )
     parser.add_argument(
         "--scan_symlink_dir",

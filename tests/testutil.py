@@ -16,9 +16,10 @@ class AllFileScannerMock(AllFileScanner):
         self,
         targets=None,
         scan_symlink_dir: bool = False,
+        dst_dir_name: str = ".old",
         all_files: dict[str, FoundFile] = {},
     ) -> None:
-        super().__init__(targets, scan_symlink_dir)
+        super().__init__(targets, scan_symlink_dir, dst_dir_name)
         self._all_files = all_files
 
     def get_all_files(self) -> dict[str, FoundFile]:

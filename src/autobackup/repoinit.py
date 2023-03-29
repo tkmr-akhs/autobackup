@@ -59,7 +59,9 @@ class BackupRepositoryFactory:
         self._dry_run = dry_run
 
         self._scanner = AllFileScanner(
-            [target["path"] for target in targets], scan_symlink_dir
+            {target["path"]: target["recursive"] for target in targets},
+            scan_symlink_dir,
+            self._dst_dir_name,
         )
 
     def get_source_repository(self) -> SourceRepository:
