@@ -72,6 +72,21 @@ class Test_validate_app_cnf:
         # Assert
         assert not cnf_error is None
 
+    @staticmethod
+    def test_IfTargetDirPathIsDuplicateThenRaiseException():
+        # Arrange
+        app_cnf = {
+            "common": {"destination_dir": "a", "tmp_dirpath": "a", "var_dirpath": "a"},
+            "targets": [{"path": "path1"}, {"path": "path1"}],
+        }
+
+        # Act
+        with pytest.raises(cnf.CnfError) as cnf_error:
+            cnf.validate_app_cnf(app_cnf)
+
+        # Assert
+        assert not cnf_error is None
+
 
 class Test_merge_app_cnf:
     @staticmethod

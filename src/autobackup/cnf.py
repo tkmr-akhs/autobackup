@@ -120,6 +120,11 @@ def validate_app_cnf(cnf: dict) -> None:
     if os.path.isabs(cnf["common"]["destination_dir"]):
         raise CnfError("Configuration failed (destination_dir is absolute path)")
 
+    if "targets" in cnf and cnf["targets"]:
+        target_paths = [target["path"] for target in cnf["targets"]]
+        if len(target_paths) != len(set(target_paths)):
+            raise CnfError("Duplicate target directory.")
+
 
 def merge_app_cnf(
     app_cnf: dict[str, Any],
