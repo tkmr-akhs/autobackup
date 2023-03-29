@@ -75,9 +75,11 @@ class RecursiveScanDir:
                 yield FoundFile(item.path, dirpath)
 
         if dst_dir_name:
-            for item in os.scandir(os.path.join(dirpath, dst_dir_name)):
-                if not item.is_dir():
-                    yield FoundFile(item.path, dirpath)
+            dst_dir_path = os.path.join(dirpath, dst_dir_name)
+            if os.path.exists(dst_dir_path):
+                for item in os.scandir(dst_dir_path):
+                    if not item.is_dir():
+                        yield FoundFile(item.path, dirpath)
 
 
 class FoundFile(os.PathLike):
