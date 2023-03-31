@@ -27,24 +27,30 @@ class AllFileScanner:
             dict[str, fsutil.FoundFile]: Files that is found
         """
         result = {}
-        prev_total = 0
-        current_total = -1
+        files_total = 0
+        dirs_total = 0
         r_scanner = fsutil.RecursiveScanDir()
         for target_path, recursive in self._target_dirs.items():
             if recursive:
-                found_files = r_scanner.recursive_scandir(
+                found_files_gen = r_scanner.recursive_scandir(
                     target_path, self._scan_symlink_dir
                 )
             else:
-                found_files = r_scanner.scandir(target_path, self._dst_dir_name)
+                found_files_gen = r_scanner.scandir(target_path, self._dst_dir_name)
+
+            found_files = [found_file for found_file in found_files_gen]
 
             for file in found_files:
                 result[file.normpath_str] = file
 
-            current_total = len(result)
-            self._logger.info(
-                "SCAN_DIR: (%i files) %s", current_total - prev_total, target_path
+            files_count = len(found_files)
+            dirs_count = len({found_file.parent for found_file in found_files})
+            files_total += files_count
+            dirs_total += dirs_count
+            self._logger.debug(
+                "SCAN_DIR: (%i files, %i dirs) %s", files_count, dirs_count, target_path
             )
-            prev_total = current_total
+
+        self._logger.info("SCAN_DIR: total %i files, %i dirs", files_total, dirs_total)
 
         return result

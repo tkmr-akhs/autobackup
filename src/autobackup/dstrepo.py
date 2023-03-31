@@ -288,7 +288,7 @@ class DestinationRepository:
                 self._logger.info(
                     "COPY_FILE_TO_[%s]: (%i MB) %s",
                     self._dst_dir_name,
-                    math.ceil(src_file.size / 1024.0 / 1024.0),
+                    round(src_file.size / 1024.0 / 1024.0 + 0.0005),
                     src_file,
                 )
                 return (src_file, dst_file)
