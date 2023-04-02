@@ -271,7 +271,9 @@ class Test_ConfigurationLoader_get_log_cnf:
         cnf_loader = cnf.ConfigurationLoader("tests/data/cnf")
 
         # Act
-        actual = cnf_loader.get_log_cnf({"common": {"log_dirpath": ""}}).keys()
+        actual = cnf_loader.get_log_cnf(
+            {"common": {"log_dirpath": "", "debug": False}}
+        ).keys()
 
         # Assert
         assert set(actual) == set(

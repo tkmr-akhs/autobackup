@@ -16,6 +16,7 @@ class Test_init_app:
         appinit.init_app(
             {
                 "common": {
+                    "dry_run": False,
                     "tmp_dirpath": f"{testdata_root}/tmp",
                     "var_dirpath": f"{testdata_root}/var",
                     "log_dirpath": f"{testdata_root}/var/log",
@@ -39,6 +40,7 @@ class Test_init_app:
         appinit.init_app(
             {
                 "common": {
+                    "dry_run": False,
                     "tmp_dirpath": f"{testdata_root}/tmp",
                     "var_dirpath": f"{testdata_root}/var",
                     "log_dirpath": f"{testdata_root}/var/log",

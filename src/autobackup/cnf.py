@@ -4,14 +4,14 @@ import json
 import os
 import pathlib
 from logging import (
-    Filter,
-    LogRecord,
     NOTSET,
     DEBUG,
     INFO,
     WARNING,
     ERROR,
     CRITICAL,
+    Filter,
+    LogRecord,
     getLevelName,
     getLevelNamesMapping,
 )
@@ -186,7 +186,9 @@ def get_cli_cnf(args: list[str]) -> dict[str, Any]:
     parser.add_argument(
         "--dry_run",
         action="store_true",
-        help="Perform a dry run to preview changes without actually executing them.",
+        help="Perform a dry run to preview changes without actually executing them."
+        "The internal database is updated,"
+        "but the database files are automatically backed up prior to execution.",
     )
     parser.add_argument(
         "--debug",

@@ -33,13 +33,13 @@ level = "NOTSET"
 handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [handlers.stderrHandler]
-level = "WARN"
+level = "WARNING"
 class = "logging.StreamHandler"
 formatter = "simpleFormatter"
 stream = "ext://sys.stderr"
 
 [handlers.stdoutHandler]
-level = "WARN"
+level = "WARNING"
 class = "logging.StreamHandler"
 formatter = "simpleFormatter"
 filters = ["levelOrHigherDiscardFilter"]
