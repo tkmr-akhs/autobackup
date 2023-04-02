@@ -2,37 +2,44 @@ version = 1
 
 [loggers.root]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [loggers.main]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [loggers.srcrepo]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [loggers.fsutil]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [loggers.bkup]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [loggers.dstrepo]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [loggers.metarepo]
 level = "NOTSET"
-handlers = ["fileHandler", "stderrHandler"]
+handlers = ["fileHandler", "stderrHandler", "stdoutHandler"]
 
 [handlers.stderrHandler]
 level = "WARN"
 class = "logging.StreamHandler"
 formatter = "simpleFormatter"
 stream = "ext://sys.stderr"
+
+[handlers.stdoutHandler]
+level = "WARN"
+class = "logging.StreamHandler"
+formatter = "simpleFormatter"
+filters = ["levelOrHigherDiscardFilter"]
+stream = "ext://sys.stdout"
 
 [handlers.fileHandler]
 # Don't rename or remove this handler
@@ -42,6 +49,9 @@ formatter = "simpleFormatter"
 when = "W0"
 backupCount = 14
 atTime = 00:00:00
+
+[filters.levelOrHigherDiscardFilter]
+level = "WARNING"
 
 [formatters.simpleFormatter]
 format = "%(asctime)s [%(levelname)s](%(filename)s:%(lineno)s) %(message)s"

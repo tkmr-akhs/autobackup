@@ -3,6 +3,18 @@ import argparse
 import json
 import os
 import pathlib
+from logging import (
+    Filter,
+    LogRecord,
+    NOTSET,
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR,
+    CRITICAL,
+    getLevelName,
+    getLevelNamesMapping,
+)
 from typing import Any
 
 import tomllib
@@ -89,12 +101,28 @@ class ConfigurationLoader:
         Returns:
             dict: Logging configuration
         """
+
+        class _LevelOrHigherDiscardFilter(Filter):
+            def __init__(self, level: str) -> None:
+                super().__init__()
+                self._level = getLevelNamesMapping().get(level, NOTSET)
+
+            def filter(self, record: LogRecord) -> bool:
+                return record.levelno < self._level
+
         with open(os.path.join(self._cnf_dir, self._log_cnf), mode="rb") as fp:
             log_cnf = tomllib.load(fp)
 
         log_cnf["handlers"]["fileHandler"]["filename"] = (
             os.path.normpath(app_cnf["common"]["log_dirpath"]) + os.sep + self._log_name
         )
+
+        if app_cnf["common"]["debug"]:
+            log_cnf["handlers"]["stdoutHandler"]["level"] = getLevelName(DEBUG)
+
+        log_cnf["filters"]["levelOrHigherDiscardFilter"][
+            "()"
+        ] = _LevelOrHigherDiscardFilter
 
         return log_cnf
 
@@ -159,6 +187,11 @@ def get_cli_cnf(args: list[str]) -> dict[str, Any]:
         "--dry_run",
         action="store_true",
         help="Perform a dry run to preview changes without actually executing them.",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Print logs with the levels of INFO and DEBUG to the standard output.",
     )
     parser.add_argument(
         "--cnf_dirpath", help="Directory containing configuration files."
